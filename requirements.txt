@@ -5,4 +5,5 @@ sklearn
 matplotlib
 scipy
 scikit-learn
+pytest
 
