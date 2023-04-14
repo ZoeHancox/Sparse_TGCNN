@@ -136,40 +136,72 @@ class TGCNN_layer(tf.keras.layers.Layer):
         return tf.norm(self.w, ord='euclidean')
 
     
-    ####### THIS GRAPH_REG FUNCTION NEEDS CHANGING TO THE OTHER SPARSE CODE FROM THE 'graph_reg_sandbox' in the 'MSK_code' onedrive FOLDER #######
+    
+
+
     def graph_reg(self):
         '''Structured L1-regularization to try enforce graph structure. 
             This penalises if there is no feeder event or prior connections.
         Returns:
             deviance: float representing unscaled deviance from perfect graph structure
         '''
-        def filter_deviance(Fi,
-                            filtersize = self.filter_size):
-            '''
-            Args:
-                Fi: weights [num_nodes, num_nodes, filter_size, num_filters]
-                filtersize: number of time steps (t) to use in 3D CNN filters
-            Returns:
-                deviance: float representing unscaled deviance from perfect graph structure
+        # def filter_deviance(Fi,
+        #                     filtersize = self.filter_size):
+        #     '''
+        #     Args:
+        #         Fi: weights [num_nodes, num_nodes, filter_size, num_filters]
+        #         filtersize: number of time steps (t) to use in 3D CNN filters
+        #     Returns:
+        #         deviance: float representing unscaled deviance from perfect graph structure
                 
-            '''
-            deviance = tf.constant(0.0, dtype=tf.float32)
-            threshold = tf.constant(1e-3, dtype=tf.float32)
-            #print(tf.shape(Fi))
-            Fiabs = tf.abs(Fi)
+        #     '''
+        #     deviance = tf.constant(0.0, dtype=tf.float32)
+        #     threshold = tf.constant(1e-3, dtype=tf.float32)
+        #     #print(tf.shape(Fi))
+        #     Fiabs = tf.abs(Fi)
 
-            k = tf.constant(0, dtype=tf.int32)
-            def in_loop(k, deviance):
-                print(tf.shape(Fiabs))
-                where = tf.greater(Fiabs[k], threshold)
-                cols = tf.equal(tf.reduce_any(where, axis=0), tf.constant(False, dtype=tf.bool))
-                deviance += tf.reduce_sum(tf.boolean_mask(Fiabs[k+1], cols))
-                return k + 1, deviance
+        #     k = tf.constant(0, dtype=tf.int32)
+        #     def in_loop(k, deviance):
+        #         print(tf.shape(Fiabs))
+        #         where = tf.greater(Fiabs[k], threshold)
+        #         cols = tf.equal(tf.reduce_any(where, axis=0), tf.constant(False, dtype=tf.bool))
+        #         deviance += tf.reduce_sum(tf.boolean_mask(Fiabs[k+1], cols))
+        #         return k + 1, deviance
 
-            k, deviance = tf.while_loop(lambda k, deviance: k < filtersize-1, in_loop, [k, deviance])
-            return deviance
+        #     k, deviance = tf.while_loop(lambda k, deviance: k < filtersize-1, in_loop, [k, deviance])
+        #     return deviance
         #print(tf.shape(self.w))
         #print(tf.shape(self.w[:,0]))
+        def filter_deviance(filter, filtersize=self.filter_size):
+            """Calculates the deviance of a sparse graph where deviance is
+            defined as when a graph has no feeder event or following
+            connections.
+
+            Args:
+                filter (tf.Tensor): Weights from the graph.
+                filtersize (int): Number of time steps (t) to use in 3D CNN filters.
+
+            Returns:
+                float: Unscaled deviance from the so-called 'perfect' graph.
+            """
+            Fiabs = tf.abs(filter)
+            threshold = 1.1
+            deviances = []
+            k=0
+            while k < filtersize:
+                timestep = Fiabs[k::filtersize]
+                above_thres = tf.cast(tf.greater(timestep, threshold), tf.bool)
+                below_thres = tf.cast(tf.less(timestep, threshold), tf.bool)
+                prior_connection = tf.reduce_any(above_thres)
+                
+                if not prior_connection:
+                    deviances.append(tf.reduce_sum(tf.boolean_mask(Fiabs[k+1::filtersize], below_thres)))
+                
+                k += 1
+
+            deviance = tf.reduce_sum(deviances)
+            
+            return deviance.numpy()
         total_deviance = filter_deviance(self.w[:, 0]) # first filter weights
         for featurenum in range(1, self.w.shape[1]): # loop through the number of filters
             total_deviance += filter_deviance(self.w[:, featurenum])
