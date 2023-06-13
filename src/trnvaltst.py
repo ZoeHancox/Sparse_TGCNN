@@ -26,7 +26,31 @@ def train_step(x,y_batch_train,reg_strength,class_weights,model,L1_ablation, L2_
 
         trn_logits = model(x_batch_train, training=True)  # Logits (probability of output being 1)
         dummy_pred = utils.logits_to_one_hot(trn_logits)
+        print("Type of dummy_pred is:")
+        print(type(dummy_pred))
+        print("Type of y_batch_train is:")
+        print(type(y_batch_train))
 
+        print("Values are:")
+        print("dummy_pred")
+        print(dummy_pred)
+        print("y_batch_train")
+        print(y_batch_train)
+
+        print("Shapes:")
+        print("dummy_pred")
+        print(dummy_pred.shape)
+        print("y_batch_train")
+        print(y_batch_train.shape)
+
+        y_batch_train_new=y_batch_train
+        y_batch_train=utils.logits_to_one_hot(y_batch_train_new)
+
+        print("New Shapes:")
+        print("dummy_pred")
+        print(dummy_pred.shape)
+        print("y_batch_train")
+        print(y_batch_train.shape)
 
         if weighted_loss:
             trn_loss = utils.calc_weighted_loss(class_weights, y_batch_train, trn_logits)
@@ -72,8 +96,21 @@ def train_step(x,y_batch_train,reg_strength,class_weights,model,L1_ablation, L2_
     trn_recall_metric = recall_score(y_batch_train, dummy_pred, average=None, zero_division=1)
     indiv_trn_recall_metric = recall_score(y_batch_train, dummy_pred, average='weighted', zero_division=1)
 
-    trn_auc_metric = roc_auc_score(y_batch_train, dummy_pred, average=None, multi_class='ovo')
-    indiv_trn_auc_metric = roc_auc_score(y_batch_train, dummy_pred, average='weighted', multi_class='ovo')
+
+    # trn_auc_metric = roc_auc_score(y_batch_train, dummy_pred, average=None, multi_class='ovo')
+    trn_auc_metric = 0
+    try:
+        trn_auc_metric = roc_auc_score(y_batch_train, dummy_pred, average=None, multi_class='ovo')
+    except ValueError:
+        pass
+
+    
+    # indiv_trn_auc_metric = roc_auc_score(y_batch_train, dummy_pred, average='weighted', multi_class='ovo')
+    indiv_trn_auc_metric = 0
+    try:
+        indiv_trn_auc_metric = roc_auc_score(y_batch_train, dummy_pred, average='weighted', multi_class='ovo')
+    except ValueError:
+        pass
 
     trn_f1_metric = f1_score(y_batch_train, dummy_pred, average=None, zero_division=1)
     indiv_trn_f1_metric = f1_score(y_batch_train, dummy_pred, average='weighted', zero_division=1)
@@ -121,6 +158,9 @@ def val_step(x,y,reg_strength,class_weights,model,L1_ablation,weighted_loss):
 
     
     dummy_pred = utils.logits_to_one_hot(val_logits)
+
+    y_new=y
+    y=utils.logits_to_one_hot(y_new)
     
     val_acc_metric = accuracy_score(y, dummy_pred)
     #acc_indiv_score = individual_accuracy_score(y, dummy_pred) # same as recall
@@ -132,8 +172,19 @@ def val_step(x,y,reg_strength,class_weights,model,L1_ablation,weighted_loss):
     val_recall_metric = recall_score(y, dummy_pred, average='weighted', zero_division=1)
     indiv_val_recall_metric = recall_score(y, dummy_pred, average=None, zero_division=1)
     
-    val_auc_metric = roc_auc_score(y, dummy_pred, average='weighted', multi_class='ovo')
-    indiv_val_auc_metric = roc_auc_score(y, dummy_pred, average=None, multi_class='ovo')
+    # val_auc_metric = roc_auc_score(y, dummy_pred, average='weighted', multi_class='ovo')
+    val_auc_metric = 0
+    try:
+        val_auc_metric = roc_auc_score(y, dummy_pred, average='weighted', multi_class='ovo')
+    except ValueError:
+        pass
+
+    # indiv_val_auc_metric = roc_auc_score(y, dummy_pred, average=None, multi_class='ovo')
+    indiv_val_auc_metric = 0
+    try:
+        indiv_val_auc_metric = roc_auc_score(y, dummy_pred, average=None, multi_class='ovo')
+    except ValueError:
+        pass
     
     val_f1_metric = f1_score(y, dummy_pred, average='weighted', zero_division=1)
     indiv_val_f1_metric = f1_score(y, dummy_pred, average=None, zero_division=1)
