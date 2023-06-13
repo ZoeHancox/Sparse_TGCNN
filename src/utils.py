@@ -83,11 +83,9 @@ def load_in_y_visit_count(num_codes_to_use):
     df_diff['visit_util_category'] = 'Zero'
     df_full = pd.concat([row_per_patient, df_diff], ignore_index=True).sort_values(['patientnum'])
     remaining = label_select(df_full, num_codes_to_use)
-    num_in_cat_df = remaining['visit_util_category'].value_counts()
-    print('Number of labels in each category:\n',num_in_cat_df, '\n')
     
     dummy_y = get_one_hot(remaining.visit_util_category)
-    return dummy_y, num_in_cat_df
+    return dummy_y
     
     
 def print_label_occurence_order(num_codes_to_use):
