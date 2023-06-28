@@ -12,7 +12,7 @@ from sklearn.metrics import f1_score, accuracy_score, confusion_matrix, precisio
 from csv import writer
 
 
-def train_step(x,y_batch_train,reg_strength,class_weights,model,L1_ablation, L2_ablation, weighted_loss, variable_gamma, optimizer):
+def train_step(x,y_batch_train,reg_strength,class_weights,model,L1_ablation, L2_ablation, graph_reg_strength, graph_reg_incl, weighted_loss, variable_gamma, optimizer):
     x_batch_train = utils.list_to_4D_tensor(x) # takes one batch from the training set
             
     #print(y_batch_train)
@@ -70,8 +70,8 @@ def train_step(x,y_batch_train,reg_strength,class_weights,model,L1_ablation, L2_
         if L2_ablation:
             trn_loss += reg_strength * model.tg_conv_layer1.l2_reg() # apply L2 reg to the CNN layer
 
-#         if graph_reg_incl:
-#             trn_loss += graph_reg_strength * model.tg_conv_layer1.graph_reg()
+        if graph_reg_incl:
+            trn_loss += graph_reg_strength * model.tg_conv_layer1.graph_reg()
 
             #loss += graph_reg_strength * (graphconv1.graph_reg() + graphconv2.graph_reg()) + l1_reg_strength * (graphconv1.l1_reg() + graphconv2.l1_reg())
 
