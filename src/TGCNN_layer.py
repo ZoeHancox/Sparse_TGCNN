@@ -21,7 +21,8 @@ class TGCNN_layer(tf.keras.layers.Layer):
     """
     
     def __init__(self, num_nodes, num_time_steps, num_filters, filter_size, stride, variable_gamma=True, 
-                 exponential_scaling=True, parallel_iter=100, dtype_weights=tf.float32, no_timestamp=False):
+                 exponential_scaling=True, parallel_iter=100, dtype_weights=tf.float32, no_timestamp=False,
+                 constant_filter = False):
         super(TGCNN_layer, self).__init__()
         #self.graphs_4D = list_to_4D_tensor(input_graphs)
         self.num_filters = num_filters
@@ -37,9 +38,14 @@ class TGCNN_layer(tf.keras.layers.Layer):
         self.no_timestamp = no_timestamp
         
         w_init = tf.random_normal_initializer(stddev = 0.05)#1e-3)
-        self.w = tf.Variable(
-            initial_value=w_init(shape=(self.num_nodes*self.num_nodes*self.filter_size, self.num_filters)),
-            trainable=True, dtype=self.dtype_weights, name='3DCNN_Weights')
+
+        if constant_filter == False:
+            self.w = tf.Variable(
+                initial_value=w_init(shape=(self.num_nodes*self.num_nodes*self.filter_size, self.num_filters)),
+                trainable=True, dtype=self.dtype_weights, name='3DCNN_Weights')
+        else:
+            self.w = tf.transpose(tf.constant([[1, 2, 3,4, 5,6 ,7, 8], [-1, -2, -3,-4, -5,-6 ,-7, -8]], dtype=self.dtype_weights))
+
 #        self.w = tf.transpose(tf.constant([[1, 2, 3,4, 5,6 ,7, 8], [-1, -2, -3,-4, -5,-6 ,-7, -8]], dtype=self.dtype_weights))
         
         g_init = tf.random_normal_initializer()
