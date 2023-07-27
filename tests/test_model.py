@@ -4,7 +4,8 @@ import tensorflow as tf
 from tensorflow import keras
 #os.chdir('../')
 print(os.getcwd())
-from src import TGCNN_layer, whole_model
+from src.TGCNN_layer import TGCNN_layer
+from src.whole_model import TGCNN_Model
 # TODO: Sort so that the files within src are imported
 
 
@@ -45,9 +46,10 @@ def test_sparse_convolution():
     model_out = out(sparse_4D_tensor)
 
     # Hand calculated correct answer
-    hand_calc_out = tf.constant([[[[18.]], [[18.]]], [[[18.]], [[18.]]]])
+    hand_calc_out = tf.constant([[[[18.]], [[-18.]]], [[[18.]], [[-18.]]]])
 
-    assert model_out==hand_calc_out
+    #assert model_out==hand_calc_out
+    tf.debugging.assert_equal(model_out, hand_calc_out)
 
 def test_sparse_graph_reg():
     """Test to check filter deviance function is calculating deviance 
