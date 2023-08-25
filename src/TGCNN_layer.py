@@ -22,7 +22,7 @@ class TGCNN_layer(tf.keras.layers.Layer):
     
     def __init__(self, num_nodes, num_time_steps, num_filters, filter_size, stride, variable_gamma=True, 
                  exponential_scaling=True, parallel_iter=100, dtype_weights=tf.float32, no_timestamp=False,
-                 constant_filter = False):
+                 conv_test = False, graph_reg_test = False):
         super(TGCNN_layer, self).__init__()
         #self.graphs_4D = list_to_4D_tensor(input_graphs)
         self.num_filters = num_filters
@@ -39,14 +39,21 @@ class TGCNN_layer(tf.keras.layers.Layer):
         
         w_init = tf.random_normal_initializer(stddev = 0.05)#1e-3)
 
-        if constant_filter == False:
+        if conv_test == False and graph_reg_test == False:
             self.w = tf.Variable(
                 initial_value=w_init(shape=(self.num_nodes*self.num_nodes*self.filter_size, self.num_filters)),
                 trainable=True, dtype=self.dtype_weights, name='3DCNN_Weights')
+        elif graph_reg_test == True and conv_test == False:
+            filt_complex = tf.constant([2.5, 1, 3, 0.5, 1, 3, 0.5, 1, 3, 0.5, 1, 
+                                3, 0.5, 1, 3, 0.5, 1, 3, 0.5, 1, 3, 0.5, 
+                                1, 3, 0.5, 1, 3])
+            self.w = tf.Variable(initial_value=tf.constant(filt_complex, dtype=self.dtype_weights),
+                                 trainable=True, dtype=self.dtype_weights)
+        elif conv_test == True and graph_reg_test == False:
+            self.w = tf.transpose(tf.constant([[1, 2, 3, 4, 5, 6, 7, 8], [-1, -2, -3, -4, -5, -6,-7, -8]], dtype=self.dtype_weights))
         else:
-            self.w = tf.transpose(tf.constant([[1, 2, 3,4, 5,6 ,7, 8], [-1, -2, -3,-4, -5,-6 ,-7, -8]], dtype=self.dtype_weights))
+            print("Can't set two constant tensors for the filter, change either conv_test or graph_reg_test to False :)")
 
-#        self.w = tf.transpose(tf.constant([[1, 2, 3,4, 5,6 ,7, 8], [-1, -2, -3,-4, -5,-6 ,-7, -8]], dtype=self.dtype_weights))
         
         g_init = tf.random_normal_initializer()
         if self.exponential_scaling & self.variable_gamma:
@@ -178,10 +185,12 @@ class TGCNN_layer(tf.keras.layers.Layer):
         #     return deviance
         #print(tf.shape(self.w))
         #print(tf.shape(self.w[:,0]))
-        def filter_deviance(filter, filtersize=self.filter_size):
-            """Calculates the deviance of a sparse graph where deviance is
-            defined as when a graph has no feeder event or following
-            connections.
+        def filter_deviance(self):
+            """ Calculates the sum of the absolute values of filter weights that 
+            are less than the threshold (threshold) at specific time steps k. 
+            This value is used as a measure of deviance from the so-called 'perfect' 
+            graph structure. The deviance calculation aims to penalize the absence of 
+            feeder events or prior connections in the graph represented by the filter weights.
 
             Args:
                 filter (tf.Tensor): Weights from the graph.
@@ -190,18 +199,18 @@ class TGCNN_layer(tf.keras.layers.Layer):
             Returns:
                 float: Unscaled deviance from the so-called 'perfect' graph.
             """
-            Fiabs = tf.abs(filter)
+            Fiabs = tf.abs(self.w)
             threshold = 1.1
             deviances = []
             k=0
-            while k < filtersize:
-                timestep = Fiabs[k::filtersize]
+            while k < self.filter_size:
+                timestep = Fiabs[k::self.filter_size]
                 above_thres = tf.cast(tf.greater(timestep, threshold), tf.bool)
                 below_thres = tf.cast(tf.less(timestep, threshold), tf.bool)
                 prior_connection = tf.reduce_any(above_thres)
                 
                 if not prior_connection:
-                    deviances.append(tf.reduce_sum(tf.boolean_mask(Fiabs[k+1::filtersize], below_thres)))
+                    deviances.append(tf.reduce_sum(tf.boolean_mask(Fiabs[k+1::self.filter_size], below_thres)))
                 
                 k += 1
 
