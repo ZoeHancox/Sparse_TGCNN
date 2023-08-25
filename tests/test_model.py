@@ -77,8 +77,7 @@ def test_sparse_graph_reg():
 
     tg_layer = TGCNN_layer(num_nodes=3, num_time_steps=3, num_filters=1,
                        filter_size=3, stride=1, graph_reg_test = True)
-    deviance = tg_layer.graph_reg.filter_deviance()
-
+    total_deviance, _ = tg_layer.graph_reg()
     exp_deviance = 27.0
-    assert deviance == exp_deviance
+    assert total_deviance == exp_deviance
     

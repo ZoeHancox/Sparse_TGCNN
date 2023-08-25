@@ -156,36 +156,11 @@ class TGCNN_layer(tf.keras.layers.Layer):
         '''Structured L1-regularization to try enforce graph structure. 
             This penalises if there is no feeder event or prior connections.
         Returns:
-            deviance: float representing unscaled deviance from perfect graph structure
+            total_deviance: float representing unscaled deviance from perfect graph structure
+            scaled_deviance: float representing scaled deviance from perfect graph structure
         '''
-        # def filter_deviance(Fi,
-        #                     filtersize = self.filter_size):
-        #     '''
-        #     Args:
-        #         Fi: weights [num_nodes, num_nodes, filter_size, num_filters]
-        #         filtersize: number of time steps (t) to use in 3D CNN filters
-        #     Returns:
-        #         deviance: float representing unscaled deviance from perfect graph structure
-                
-        #     '''
-        #     deviance = tf.constant(0.0, dtype=tf.float32)
-        #     threshold = tf.constant(1e-3, dtype=tf.float32)
-        #     #print(tf.shape(Fi))
-        #     Fiabs = tf.abs(Fi)
 
-        #     k = tf.constant(0, dtype=tf.int32)
-        #     def in_loop(k, deviance):
-        #         print(tf.shape(Fiabs))
-        #         where = tf.greater(Fiabs[k], threshold)
-        #         cols = tf.equal(tf.reduce_any(where, axis=0), tf.constant(False, dtype=tf.bool))
-        #         deviance += tf.reduce_sum(tf.boolean_mask(Fiabs[k+1], cols))
-        #         return k + 1, deviance
-
-        #     k, deviance = tf.while_loop(lambda k, deviance: k < filtersize-1, in_loop, [k, deviance])
-        #     return deviance
-        #print(tf.shape(self.w))
-        #print(tf.shape(self.w[:,0]))
-        def filter_deviance(self):
+        def filter_deviance(w_filt, filter_size):
             """ Calculates the sum of the absolute values of filter weights that 
             are less than the threshold (threshold) at specific time steps k. 
             This value is used as a measure of deviance from the so-called 'perfect' 
@@ -199,28 +174,41 @@ class TGCNN_layer(tf.keras.layers.Layer):
             Returns:
                 float: Unscaled deviance from the so-called 'perfect' graph.
             """
-            Fiabs = tf.abs(self.w)
+            Fiabs = tf.abs(w_filt)
             threshold = 1.1
             deviances = []
             k=0
-            while k < self.filter_size:
-                timestep = Fiabs[k::self.filter_size]
+            while k < filter_size:
+                timestep = Fiabs[k::filter_size]
                 above_thres = tf.cast(tf.greater(timestep, threshold), tf.bool)
                 below_thres = tf.cast(tf.less(timestep, threshold), tf.bool)
                 prior_connection = tf.reduce_any(above_thres)
                 
                 if not prior_connection:
-                    deviances.append(tf.reduce_sum(tf.boolean_mask(Fiabs[k+1::self.filter_size], below_thres)))
+                    deviances.append(tf.reduce_sum(tf.boolean_mask(Fiabs[k+1::filter_size], below_thres)))
                 
                 k += 1
 
             deviance = tf.reduce_sum(deviances)
             
             return deviance.numpy()
-        total_deviance = filter_deviance(self.w[:, 0]) # first filter weights
-        for featurenum in range(1, self.w.shape[1]): # loop through the number of filters
-            total_deviance += filter_deviance(self.w[:, featurenum])
-        return total_deviance/tf.size(self.w, out_type=tf.float32)
+
+        # if graph_reg_test:
+        #     total_deviance = filter_deviance(self.w[:])
+        # else:
+        #     total_deviance = filter_deviance(self.w[:, 0]) # first filter weights
+        #     for featurenum in range(1, self.w.shape[1]): # loop through the number of filters
+        #         total_deviance += filter_deviance(self.w[:, featurenum])
+        # total_deviance = filter_deviance(self.w[:])
+        print(self.w)
+        try:
+            total_deviance = filter_deviance(self.w[:, 0]) # first filter weights
+            for featurenum in range(1, self.w.shape[1]): # loop through the number of filters
+                total_deviance += filter_deviance(self.w[:, featurenum], self.filter_size)
+        except:
+            total_deviance = filter_deviance(self.w[:], self.filter_size)
+
+        return total_deviance, total_deviance/tf.size(self.w, out_type=tf.float32)
     
     
     

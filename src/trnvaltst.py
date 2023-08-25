@@ -26,31 +26,31 @@ def train_step(x,y_batch_train,reg_strength,class_weights,model,L1_ablation, L2_
 
         trn_logits = model(x_batch_train, training=True)  # Logits (probability of output being 1)
         dummy_pred = utils.logits_to_one_hot(trn_logits)
-        print("Type of dummy_pred is:")
-        print(type(dummy_pred))
-        print("Type of y_batch_train is:")
-        print(type(y_batch_train))
+        # print("Type of dummy_pred is:")
+        # print(type(dummy_pred))
+        # print("Type of y_batch_train is:")
+        # print(type(y_batch_train))
 
-        print("Values are:")
-        print("dummy_pred")
-        print(dummy_pred)
-        print("y_batch_train")
-        print(y_batch_train)
+        # print("Values are:")
+        # print("dummy_pred")
+        # print(dummy_pred)
+        # print("y_batch_train")
+        # print(y_batch_train)
 
-        print("Shapes:")
-        print("dummy_pred")
-        print(dummy_pred.shape)
-        print("y_batch_train")
-        print(y_batch_train.shape)
+        # print("Shapes:")
+        # print("dummy_pred")
+        # print(dummy_pred.shape)
+        # print("y_batch_train")
+        # print(y_batch_train.shape)
 
         y_batch_train_new=y_batch_train
         y_batch_train=utils.logits_to_one_hot(y_batch_train_new)
 
-        print("New Shapes:")
-        print("dummy_pred")
-        print(dummy_pred.shape)
-        print("y_batch_train")
-        print(y_batch_train.shape)
+        # print("New Shapes:")
+        # print("dummy_pred")
+        # print(dummy_pred.shape)
+        # print("y_batch_train")
+        # print(y_batch_train.shape)
 
         if weighted_loss:
             trn_loss = utils.calc_weighted_loss(class_weights, y_batch_train, trn_logits)
@@ -71,7 +71,8 @@ def train_step(x,y_batch_train,reg_strength,class_weights,model,L1_ablation, L2_
             trn_loss += reg_strength * model.tg_conv_layer1.l2_reg() # apply L2 reg to the CNN layer
 
         if graph_reg_incl:
-            trn_loss += graph_reg_strength * model.tg_conv_layer1.graph_reg()
+            _, scaled_deviance = model.tg_conv_layer1.graph_reg()
+            trn_loss += graph_reg_strength * scaled_deviance #model.tg_conv_layer1.graph_reg()
 
             #loss += graph_reg_strength * (graphconv1.graph_reg() + graphconv2.graph_reg()) + l1_reg_strength * (graphconv1.l1_reg() + graphconv2.l1_reg())
 
