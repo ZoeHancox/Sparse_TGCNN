@@ -28,8 +28,8 @@ def train_step(x,y_batch_train,reg_strength,class_weights,model,L1_ablation, L2_
         
         trn_logits = model(x_batch_train, training=True)  # Logits (probability of output being 1)
         dummy_pred = utils.logits_to_one_hot(trn_logits)
-        print("trn_logits:", trn_logits)
-        print("dummy_pred", dummy_pred)
+        # print("trn_logits:", trn_logits)
+        # print("dummy_pred", dummy_pred)
         # print("Type of dummy_pred is:")
         # print(type(dummy_pred))
         # print("Type of y_batch_train is:")
@@ -169,8 +169,10 @@ def val_step(x,y,reg_strength,class_weights,model,L1_ablation,weighted_loss):
     
     dummy_pred = utils.logits_to_one_hot(val_logits)
 
-    y_new=y
-    y=utils.logits_to_one_hot(y_new)
+    # y_new=y
+    # y=utils.logits_to_one_hot(y_new)
+    encoder = OneHotEncoder(sparse=False)
+    y = encoder.fit_transform(y)
     
     val_acc_metric = accuracy_score(y, dummy_pred)
     #acc_indiv_score = individual_accuracy_score(y, dummy_pred) # same as recall
