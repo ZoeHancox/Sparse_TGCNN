@@ -49,7 +49,8 @@ def draw_confusion_mat(y_batch_test, test_logits, class_names, run_name, ran_sea
         sns confusion matrix plot.
     """
     y_batch_test_array = np.array(y_batch_test)
-    y_true = np.argmax(y_batch_test_array, axis=1)
+    #y_true = np.argmax(y_batch_test_array, axis=1)
+    y_true = np.concatenate(y_batch_test_array)#.astype(np.int64)
     y_pred = np.argmax(test_logits, axis=1)
     cn=confusion_matrix(y_true,y_pred)
 
