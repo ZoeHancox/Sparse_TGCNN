@@ -10,11 +10,13 @@ from tensorflow import keras
 import tensorflow as tf
 from sklearn.metrics import f1_score, accuracy_score, confusion_matrix, precision_score, roc_auc_score, recall_score
 from csv import writer
+from sklearn.preprocessing import OneHotEncoder
 
 
 def train_step(x,y_batch_train,reg_strength,class_weights,model,L1_ablation, L2_ablation, graph_reg_strength, graph_reg_incl, weighted_loss, variable_gamma, optimizer):
     x_batch_train = utils.list_to_4D_tensor(x) # takes one batch from the training set
-            
+    #initial_weights = model.get_weights()
+    #print("Initial weights:", initial_weights)
     #print(y_batch_train)
     #print(x_batch_train)
     #print(tf.shape(x_batch_train))
@@ -23,9 +25,11 @@ def train_step(x,y_batch_train,reg_strength,class_weights,model,L1_ablation, L2_
 
         # Run the forward pass of the layer.
         # The operations that the layer applies to its inputs are going to be recorded on the GradientTape.
-
+        
         trn_logits = model(x_batch_train, training=True)  # Logits (probability of output being 1)
         dummy_pred = utils.logits_to_one_hot(trn_logits)
+        print("trn_logits:", trn_logits)
+        print("dummy_pred", dummy_pred)
         # print("Type of dummy_pred is:")
         # print(type(dummy_pred))
         # print("Type of y_batch_train is:")
@@ -43,8 +47,8 @@ def train_step(x,y_batch_train,reg_strength,class_weights,model,L1_ablation, L2_
         # print("y_batch_train")
         # print(y_batch_train.shape)
 
-        y_batch_train_new=y_batch_train
-        y_batch_train=utils.logits_to_one_hot(y_batch_train_new)
+        encoder = OneHotEncoder(sparse=False)
+        y_batch_train = encoder.fit_transform(y_batch_train)
 
         # print("New Shapes:")
         # print("dummy_pred")
@@ -81,13 +85,19 @@ def train_step(x,y_batch_train,reg_strength,class_weights,model,L1_ablation, L2_
         else:
             gamma_val = 'N/A'
 
+
+    #print("Trainable weights:", model.trainable_weights)
     # Use the gradient tape to automatically retrieve
     # the gradients of the trainable variables with respect to the loss.
     grads = tape.gradient(trn_loss, model.trainable_weights)
+    # print("grads:", grads)
 
     # Run one step of gradient descent by updating
     # the value of the variables to minimize the loss.
     optimizer.apply_gradients(zip(grads, model.trainable_weights))
+
+    #trained_weights = model.get_weights()
+    #print("Trained weights:", trained_weights)
     
     trn_acc_metric = accuracy_score(y_batch_train, dummy_pred)
     
@@ -119,8 +129,7 @@ def train_step(x,y_batch_train,reg_strength,class_weights,model,L1_ablation, L2_
     
     #print("Actual y", y_batch_train)
     #print("Predicted y", dummy_pred)    
-    
-    
+   
     return trn_logits, trn_loss, trn_acc_metric, trn_prec_metric, trn_recall_metric, trn_auc_metric, trn_f1_metric, indiv_trn_prec_metric, indiv_trn_recall_metric, indiv_trn_auc_metric, indiv_trn_f1_metric    
     
     
