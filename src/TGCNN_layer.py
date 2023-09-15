@@ -175,7 +175,7 @@ class TGCNN_layer(tf.keras.layers.Layer):
                 float: Unscaled deviance from the so-called 'perfect' graph.
             """
             Fiabs = tf.abs(w_filt)
-            threshold = 1.1
+            threshold = 0.1
             deviances = []
             k=0
             while k < filter_size:
@@ -200,9 +200,9 @@ class TGCNN_layer(tf.keras.layers.Layer):
         #     for featurenum in range(1, self.w.shape[1]): # loop through the number of filters
         #         total_deviance += filter_deviance(self.w[:, featurenum])
         # total_deviance = filter_deviance(self.w[:])
-        print(self.w)
+        # print(self.w)
         try:
-            total_deviance = filter_deviance(self.w[:, 0]) # first filter weights
+            total_deviance = filter_deviance(self.w[:, 0], self.filter_size) # first filter weights
             for featurenum in range(1, self.w.shape[1]): # loop through the number of filters
                 total_deviance += filter_deviance(self.w[:, featurenum], self.filter_size)
         except:
