@@ -55,7 +55,7 @@ class EarlyStopping:
             self.trace_func(f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).')
         self.val_loss_min = val_loss # replace the lowest loss value with the new lowest loss value
 
-    def print_checkpoint_metric(self, train_batch_losses, val_batch_loss, test_batch_loss, train_batch_acc, val_batch_acc, test_batch_acc, train_batch_auc, val_batch_auc, test_batch_auc, train_auc_indiv_ave, val_auc_indiv_ave, test_auc_indiv_ave, train_batch_prec, val_batch_prec, test_batch_prec, train_prec_indiv_ave, val_prec_indiv_ave, test_prec_indiv_ave, train_batch_recall, val_batch_recall, test_batch_recall, train_recall_indiv_ave, val_recall_indiv_ave, test_recall_indiv_ave, train_batch_f1, val_batch_f1, test_batch_f1, train_f1_indiv_ave, val_f1_indiv_ave, test_f1_indiv_ave):
+    def print_checkpoint_metric(self, train_batch_losses, val_batch_loss, test_batch_loss, train_batch_acc, val_batch_acc, test_batch_acc, train_batch_auc, val_batch_auc, test_batch_auc, train_auc_indiv_ave, val_auc_indiv_ave, test_auc_indiv_ave, train_batch_prec, val_batch_prec, test_batch_prec, train_prec_indiv_ave, val_prec_indiv_ave, test_prec_indiv_ave, train_batch_recall, val_batch_recall, test_batch_recall, train_recall_indiv_ave, val_recall_indiv_ave, test_recall_indiv_ave, train_batch_f1, val_batch_f1, test_batch_f1, train_f1_indiv_ave, val_f1_indiv_ave, test_f1_indiv_ave, y_batch_test, test_logits):
         
         checkpoint_train_loss = np.mean(train_batch_losses)
         checkpoint_val_loss = np.mean(val_batch_loss)
@@ -96,5 +96,7 @@ class EarlyStopping:
         checkpoint_val_f1_indiv = val_f1_indiv_ave
         checkpoint_test_f1_indiv = test_f1_indiv_ave
         
-        return checkpoint_train_loss, checkpoint_val_loss, checkpoint_test_loss, checkpoint_train_acc, checkpoint_val_acc,  checkpoint_test_acc, checkpoint_train_auc, checkpoint_val_auc,  checkpoint_test_auc, checkpoint_train_auc_indiv, checkpoint_val_auc_indiv, checkpoint_test_auc_indiv, checkpoint_train_prec, checkpoint_val_prec, checkpoint_test_prec, checkpoint_train_prec_indiv, checkpoint_val_prec_indiv, checkpoint_test_prec_indiv, checkpoint_train_recall, checkpoint_val_recall, checkpoint_test_recall, checkpoint_train_recall_indiv, checkpoint_val_recall_indiv, checkpoint_test_recall_indiv, checkpoint_train_f1, checkpoint_val_f1, checkpoint_test_f1, checkpoint_train_f1_indiv, checkpoint_val_f1_indiv, checkpoint_test_f1_indiv
-
+        checkpoint_y_test = y_batch_test
+        checkpoint_logits_test = test_logits
+        
+        return checkpoint_train_loss, checkpoint_val_loss, checkpoint_test_loss, checkpoint_train_acc, checkpoint_val_acc,  checkpoint_test_acc, checkpoint_train_auc, checkpoint_val_auc,  checkpoint_test_auc, checkpoint_train_auc_indiv, checkpoint_val_auc_indiv, checkpoint_test_auc_indiv, checkpoint_train_prec, checkpoint_val_prec, checkpoint_test_prec, checkpoint_train_prec_indiv, checkpoint_val_prec_indiv, checkpoint_test_prec_indiv, checkpoint_train_recall, checkpoint_val_recall, checkpoint_test_recall, checkpoint_train_recall_indiv, checkpoint_val_recall_indiv, checkpoint_test_recall_indiv, checkpoint_train_f1, checkpoint_val_f1, checkpoint_test_f1, checkpoint_train_f1_indiv, checkpoint_val_f1_indiv, checkpoint_test_f1_indiv, checkpoint_y_test, checkpoint_logits_test
