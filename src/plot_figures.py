@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.calibration import calibration_curve
 
 
 def plot_loss_curve(train_loss, val_loss, test_lost, run_name, ran_search_num):
@@ -67,3 +68,32 @@ def draw_confusion_mat(y_batch_test, test_logits, class_names, run_name, ran_sea
     plt.show()
 
 
+def draw_calibration_curves(true_y, pred_y, class_labels, run_name, ran_search_num):
+    """
+    Plot a calibration curve for a multiclass model
+    """
+    # Convert y inputs to numpy arrays
+    #true_y = np.argmax(true_y, axis=1)
+    true_y = np.concatenate(true_y)
+    pred_y = np.array(pred_y)
+    n_classes = pred_y.shape[1]
+    fraction_of_positives = []
+    mean_predicted_value = []
+    for class_idx in range(n_classes):
+        # Extract predicted probabilities and true labels for the current class
+        class_predicted_probabilities = pred_y[:, class_idx]
+        class_true_labels = (true_y == class_idx).astype(int)
+        # Calculate calibration curve for the current class
+        fraction_of_pos, mean_pred_value = calibration_curve(class_true_labels, class_predicted_probabilities, n_bins=10, normalize=True)
+        fraction_of_positives.append(fraction_of_pos)
+        mean_predicted_value.append(mean_pred_value)
+    for class_idx in range(n_classes):
+        plt.plot(mean_predicted_value[class_idx], fraction_of_positives[class_idx], 's-', label=class_labels[class_idx])
+
+    plt.plot([0, 1], [0, 1], '--', label='Ideal Calibration')
+    plt.xlabel('Mean Predicted Value')
+    plt.ylabel('Fraction of Positives')
+    plt.legend()
+    if run_name is not None:
+        plt.savefig("calibration_curves/"+run_name+"_"+str(ran_search_num)+".png")
+    plt.show()
