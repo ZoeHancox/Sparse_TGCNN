@@ -3,7 +3,11 @@
 
 ### About the Repository
 
-This repository contains the code for a sparse implementation for Temporal Graph-based 3D Convolutional Neural Networks (TG-CNNs). 
+This repository contains the code for a sparse implementation for Temporal Graph-based 3D Convolutional Neural Networks (TG-CNNs).
+
+In this research we represent graphs as 3D tensors, where the cells contain the elapsed time between two event codes being recorded:
+
+![gif of 3D tensor construction representing the temporal graph](documentation/TG-CNN_build.gif)
 
 A link to the original paper containing the non-sparse implementation for massive online open course data to predict student dropout can be found [here](https://link.springer.com/chapter/10.1007/978-3-031-16564-1_34).
 
@@ -15,6 +19,7 @@ The main code is found in the `src` folder of the repository (see Usage below fo
 
 ```
 .
+├── documentation                       # Background, explanations
 ├── src                                 # Source files
 ├────> create_fake_patients.py          # Generate fake patient data to use in model
 ├────> TGCNN_layer.py                   # Sparse 3D CNN layer 
