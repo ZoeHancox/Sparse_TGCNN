@@ -129,7 +129,7 @@ def val_step(x, y, test_demo_vals, reg_strength,class_weights,model,L1_ablation,
 
     
     if weighted_loss:
-        val_loss = utils.calc_weighted_loss(class_weights, one_hot_true_y, val_logits, binary=True)
+        val_loss = utils.calc_weighted_loss(class_weights, y, val_logits, binary=True)
     else:
         loss_value_tensor = tf.compat.v2.nn.sigmoid_cross_entropy_with_logits(y, val_logits)
         val_loss = tf.reduce_mean(loss_value_tensor)
