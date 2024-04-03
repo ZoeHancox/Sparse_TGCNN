@@ -1,6 +1,5 @@
 import numpy as np
 import math
-#import keras
 import pandas as pd
 import random
 from tensorflow import keras
@@ -12,7 +11,7 @@ class TGCNN_Model(tf.keras.Model):
     def __init__(self, num_filters=2, num_nodes=97, num_time_steps=100, 
                  filter_size=3, variable_gamma=True, exponential_scaling=True, dropout_rate = 0.2,
                 lstm_units=16, fcl1_units = 128, LSTM_ablation=False, stride=1, activation_type="relu", no_timestamp=False,
-                second_TGCNN_layer=True):
+                second_TGCNN_layer=True, num_labels=2):
         
         super(TGCNN_Model, self).__init__()
         self.LSTM_ablation = LSTM_ablation
@@ -41,9 +40,12 @@ class TGCNN_Model(tf.keras.Model):
         
         self.fcl2_short = tf.keras.layers.Dense(units=256, activation=activation_type)
         self.fcl2_long = tf.keras.layers.Dense(units=256, activation=activation_type)
+        
+        self.fcl3_short = tf.keras.layers.Dense(units=256, activation=activation_type)
 
         self.fcl_after_concat = tf.keras.layers.Dense(units=512)
-        self.fcl_to_out = tf.keras.layers.Dense(units=3)#, activation="softmax") softmax activation can't be used here with softmax_cross_entropy_with_logits otherwise loss will be more than 1
+        self.fcl_after_concat2 = tf.keras.layers.Dense(units=512)
+        self.fcl_to_out = tf.keras.layers.Dense(units=num_labels)#, activation="softmax") softmax activation can't be used here with softmax_cross_entropy_with_logits
         self.dropout = tf.keras.layers.Dropout(rate=dropout_rate)
         
     def flat_to_out(self, x):
@@ -55,22 +57,29 @@ class TGCNN_Model(tf.keras.Model):
         return out
         
     def call(self, inputs):
-        
         if self.second_TGCNN_layer == False:
             x = self.tg_conv_layer1(inputs)
+            #print("\n\nAfter 3DCNN layer out:", x)
             x = self.batchnorm1(x)
+            #print("After batchnorm layer out:", x)
             x = self.activation(x)
             x = tf.squeeze(x, axis=2)
-            if self.LSTM_ablation: # remove the LSTM layer
+            #print("Just before LSTM:", x)
+            
+            if self.LSTM_ablation: # with no LSTM layer
                 out = self.flat_to_out(x)
-                out = self.fcl_to_out(out)
-
-            else: # without removing LSTM layer
+                #out = self.fcl_to_out(out)
+            else: # with LSTM layer
                 x = tf.transpose(x, perm=[0,2,1]) # switch axis 1 and 2 for LSTM input
                 x = self.lstm(x)
                 out = self.flat_to_out(x)
-                out = self.fcl_to_out(out)
-            
+                #out = self.fcl_to_out(out)
+
+            out = self.fcl_after_concat(out)
+            out = self.activation(out)
+            out = self.fcl_after_concat2(out)
+            out = self.activation(out)
+            out = self.fcl_to_out(out)
 
             
         elif self.second_TGCNN_layer == True:
@@ -84,7 +93,7 @@ class TGCNN_Model(tf.keras.Model):
                 x_long = self.flatten(x_long)
                 x_long = self.dropout(x_long)
                 x_long = self.fcl1_long(x_long)
-                out_long = self.dropout(x_long)
+                x_long = self.dropout(x_long)
                 out_long = self.fcl2_long(x_long)
             else: # without removing LSTM layer
                 x_long = tf.transpose(x_long, perm=[0,2,1]) # switch axis 1 and 2 for LSTM input
@@ -104,30 +113,21 @@ class TGCNN_Model(tf.keras.Model):
             if self.LSTM_ablation: # remove the LSTM layer
                 out_short = self.flat_to_out(x_short)
                 
-#                 x_short = self.flatten(x_short)
-#                 x_short = self.dropout(x_short)
-#                 x_short = self.fcl1_short(x_short)
-#                 x_short = self.dropout(x_short)
-#                 out_short = self.fcl2_short(x_short)
             else: # without removing LSTM layer
                 x_short = tf.transpose(x_short, perm=[0,2,1]) # switch axis 1 and 2 for LSTM input
                 x_short = self.lstm(x_short)
                 out_short = self.flat_to_out(x_short)
-
-#                 x_short = self.flatten(x_short)
-#                 x_short = self.dropout(x_short)
-#                 x_short = self.fcl1_short(x_short)
-#                 x_short = self.dropout(x_short)
-#                 out_short = self.fcl2_short(x_short)
             
              
             
             # concatenation of the two channels/streams
             out = tf.keras.layers.Concatenate()([out_long, out_short])
             out = self.fcl_after_concat(out)
+            out = self.activation(out)
+            out = self.fcl_after_concat2(out)
+            out = self.activation(out)
             out = self.fcl_to_out(out)
             
             
             
-        
         return out
