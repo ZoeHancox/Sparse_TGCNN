@@ -9,7 +9,7 @@ In this research we represent graphs as 3D tensors, where the cells contain the 
 
 ![gif of 3D tensor construction representing the temporal graph](documentation/TG-CNN_build.gif)
 
-A link to the original paper containing the non-sparse implementation for massive online open course data to predict student dropout can be found [here](https://link.springer.com/chapter/10.1007/978-3-031-16564-1_34).
+A link to the original paper containing the non-sparse implementation for massive online open course data to predict student dropout can be found [here](https://eprints.whiterose.ac.uk/205293/1/TG-CNNs_for_Online_Course_Dropout_Prediction_03.pdf).
 
 _**Note:** Only fake data are shared in this repository. We randomly choose values to fill our fictitious dataframes. For this reason when this code is run the model will not train well. The data we use for this project ResearchOne data, therefore we can't share it with the public._
 
