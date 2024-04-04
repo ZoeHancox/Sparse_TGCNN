@@ -49,10 +49,10 @@ def create_fake_patient_df(num_patients, max_events, max_nodes):
     for row_num, row in df.iterrows():
         num_timesteps = df.iloc[row_num,3]
         values_list.append([random.uniform(0.0, 1.0) for i in range(num_timesteps)])
-        gender_list.append([random.randint(0, 1) for i in range(num_timesteps)])
-        imd_list.append([float(random.randint(0, 4))+1.0 for i in range(num_timesteps)])
-        age_list.append([float(random.randint(39, 74))+1.0 for i in range(num_timesteps)])
-        replace_list.append([random.choice(['hip', 'none']) for _ in range(num_timesteps)])
+        gender_list.append(random.randint(0, 1))
+        imd_list.append(float(random.randint(0, 4))+1.0)
+        age_list.append(float(random.randint(39, 89))+1.0)
+        replace_list.append(random.choice(['hip', 'none']))
 
     df['values'] = values_list
     df['gender'] = gender_list
