@@ -58,8 +58,7 @@ def draw_confusion_mat(y_batch_test, test_logits, class_names, run_name, ran_sea
         sns confusion matrix plot.
     """
     y_batch_test_array = np.array(y_batch_test)
-    #y_true = np.argmax(y_batch_test_array, axis=1) # not sure that we need the argmax here...
-    y_true = np.squeeze(y_batch_test_array)#.astype(np.int64)
+    y_true = np.squeeze(y_batch_test_array)
     
     # convert logits to probabilities and then to binary classifications
     odds = np.exp(test_logits)
@@ -67,7 +66,6 @@ def draw_confusion_mat(y_batch_test, test_logits, class_names, run_name, ran_sea
     probs = odds / (1 + odds)
     y_pred = np.where(probs > 0.5, 1, 0) 
     
-#     y_pred = np.argmax(test_logits, axis=1)
     cn=confusion_matrix(y_true, y_pred)
 
     sns.heatmap(cn,annot=True, fmt='d', cmap='Blues')
@@ -141,7 +139,6 @@ def draw_calibration_curve(true_y, pred_y, run_name, ran_search_num):
     Returns:
         Matplotlib figure: Calibration curve showing mean predicted value vs fraction of positives
     """
-    #true_y = np.concatenate(true_y)
        
     probs = 1 / (1 + (np.exp(-pred_y)))
     prob_histo(probs, true_y)
