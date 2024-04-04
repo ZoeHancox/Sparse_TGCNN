@@ -16,9 +16,9 @@ def create_fake_index_list(max_events, max_nodes):
     indices_list_of_lists = []
     for i in range(random.randint(min_num_events, max_events)):
         if i!= 0:
-            indices_list_of_lists.append([random.randint(1, max_nodes),indices_list_of_lists[i-1][0],max_events-i])
+            indices_list_of_lists.append([random.randint(0, max_nodes-1),indices_list_of_lists[i-1][0],max_events-i])
         else:
-            indices_list_of_lists.append([random.randint(1, max_nodes),random.randint(1, max_nodes),max_events-i])
+            indices_list_of_lists.append([random.randint(0, max_nodes-1),random.randint(0, max_nodes-1),max_events-i])
     
     return indices_list_of_lists
 
