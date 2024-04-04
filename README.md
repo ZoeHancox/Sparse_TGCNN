@@ -11,7 +11,7 @@ In this research we represent graphs as 3D tensors, where the cells contain the 
 
 A link to the original paper containing the non-sparse implementation for massive online open course data to predict student dropout can be found [here](https://link.springer.com/chapter/10.1007/978-3-031-16564-1_34).
 
-_**Note:** Only public or fake data are shared in this repository._
+_**Note:** Only fake data are shared in this repository. We randomly choose values to fill our fictitious dataframes. For this reason when this code is run the model will not train well. The data we use for this project ResearchOne data, therefore we can't share it with the public._
 
 ### Project Stucture
 
@@ -23,14 +23,18 @@ The main code is found in the `src` folder of the repository (see Usage below fo
 ├── src                                 # Source files
 ├────> create_fake_patients.py          # Generate fake patient data to use in model
 ├────> TGCNN_layer.py                   # Sparse 3D CNN layer 
-├────> trnvaltst.py                     # Train, validate and test functions
+├────> trnvaltst_sigmoid_oned.py        # Train, validate and test functions for multilabel outcomes
+├────> trnvaltst_sigmoid_oned.py        # Train, validate and test functions for binary outcomes
 ├────> utils.py                         # Helpful functions
-├────> whole_model.py                   # Model with all layers
+├────> plot_figures.py                  # Some more helpful functions for plotting figures
+├────> whole_model.py                   # Model with all layers and no demographic input
+├────> whole_model_demographics.py      # Model with all layers and demographic input
 ├── tests                               # Test using pytest
 ├── .gitignore
 ├── README.md
+├── early_stopping_cv.py                # Checkpointing and stopping the model before it overfits
 └── requirements.txt
-└── TGCNN_test_fake_patients.ipynb
+└── TGCNN_test_fake_patients.ipynb      # Notebook where the main code is ran
 
 
 ```
