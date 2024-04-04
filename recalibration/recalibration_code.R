@@ -10,7 +10,7 @@ library(pROC)
 library(rms)
 library(PRROC)
 
-setwd('./')
+setwd('./recalibration')
 
 col_names = c('Accuracy', '95% CI', 'Sensitivity', 'Specificity', 'PPV', 'NPV', 'Prevalence', 'Detection Rate', 'Detection Prevalence', 'Balanced Accuracy', 'O/E mean', 'O/E 95% CI', 'O/E SD',	'C-slope mean',	'C-slope 95% CI',	'C-slope SD', 'CITL mean',	'CITL 95% CI',	'CITL SD',	'AUROC mean', 'AUROC 95% CI',	'AUROC SD', 'AUPRC mean',	'AUPRC SD',	'AUPRC CI')
 empty_df <- data.frame(matrix(nrow = 0, ncol = length(col_names)))
@@ -265,8 +265,6 @@ unseen_df$lpnew <- unseen_logit
 if (include_subgroup=='y'){
   bootstrapnum = 10
   
-  
-  # NEED TO GET THE NEW MODEL AFTER RECALIBRATION TO GET NEW LINEAR PREDICTORS (lp)
   
   # # ORIGINAL DATA
   # print('ORIGINAL DATA')
