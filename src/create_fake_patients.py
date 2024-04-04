@@ -9,7 +9,9 @@ def create_fake_index_list(max_events, max_nodes):
         list of lists: indices for 3D matrices.
     """
 
-    return [[random.randint(1, max_nodes) for j in range(3)] for i in range(random.randint(1, max_events))]
+    # minimum number of events needs to be 2 to make a graph
+    min_num_events = 2
+    return [[random.randint(1, max_nodes) for j in range(3)] for i in range(random.randint(min_num_events, max_events))]
 
 def create_fake_patient_df(num_patients, max_events, max_nodes):
     """Create df with columns: User number | Indices (int, list of lists) |
