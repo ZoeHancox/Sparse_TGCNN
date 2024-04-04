@@ -11,7 +11,18 @@ def create_fake_index_list(max_events, max_nodes):
 
     # minimum number of events needs to be 2 to make a graph
     min_num_events = 2
-    return [[random.randint(1, max_nodes) for j in range(3)] for i in range(random.randint(min_num_events, max_events))]
+    #return [[random.randint(1, max_nodes) for j in range(3)] for i in range(random.randint(min_num_events, max_events))]
+
+    indices_list_of_lists = []
+    for i in range(random.randint(min_num_events, max_events)):
+        if i!= 0:
+            indices_list_of_lists.append([random.randint(1, max_nodes),indices_list_of_lists[i-1][0],max_events-i])
+        else:
+            indices_list_of_lists.append([random.randint(1, max_nodes),random.randint(1, max_nodes),max_events-i])
+    
+    return indices_list_of_lists
+
+    #return [[random.randint(1, max_nodes),random.randint(1, max_nodes),max_events-i] for i in range(random.randint(min_num_events, max_events))]
 
 def create_fake_patient_df(num_patients, max_events, max_nodes):
     """Create df with columns: User number | Indices (int, list of lists) |
