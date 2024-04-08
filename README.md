@@ -1,5 +1,4 @@
 # Sparse TG-CNN
-## University of Leeds
 
 ### About the Repository
 
@@ -11,7 +10,7 @@ In this research we represent graphs as 3D tensors, where the cells contain the 
 
 A link to the original paper containing the non-sparse implementation for massive online open course data to predict student dropout can be found [here](https://eprints.whiterose.ac.uk/205293/1/TG-CNNs_for_Online_Course_Dropout_Prediction_03.pdf).
 
-_**Note:** Only fake data are shared in this repository. We randomly choose values to fill our fictitious dataframes. For this reason when this code is run the model will not train well. The data we use for this project ResearchOne data, therefore we can't share it with the public._
+_**Note:** Only fake data are shared in this repository. We randomly choose values to fill our fictitious dataframes. For this reason when this code is run the model will not train well. The data we use for this project is secure ResearchOne data, therefore we can't share it with the public._
 
 ### Project Stucture
 
@@ -62,6 +61,12 @@ To create a suitable environment we suggest:
 ### Usage
 
 Run through the `TGCNN_test_fake_patients.ipynb` notebook to find out how to use this code.
+
+To run the baseline models to compare to the `TGCNN` model, run through the notebooks in `baseline_models/`.
+
+To get the test results pre-calibration and get the logits prepared for recalibration run `results/generate_scores_and_recal_prep.ipynb` and change the `run_name` to the run name you assigned to your model.
+
+To recalibrate the model on Test 1, and test the recalibrated model on Test 2 run the **R** code `recalibration/recalibration_code.R`. Enter the run name of the model. You can choose to do subgroup analysis on your model by entering `y` when prompted by 'Do you want to perform subgroup analysis with this model?'.
 
 ### Testing
 
