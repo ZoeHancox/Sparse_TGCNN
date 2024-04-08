@@ -1,6 +1,5 @@
 import numpy as np
 import math
-#import keras
 import pandas as pd
 import random
 from tensorflow import keras
@@ -20,58 +19,60 @@ class TGCNN_layer(tf.keras.layers.Layer):
             4D output tensor of features (batch_size, num_filters, 1, T-t+1)
     """
     
-    def __init__(self, num_nodes, num_time_steps, num_filters, filter_size, stride, variable_gamma=True, 
-                 exponential_scaling=True, parallel_iter=100, dtype_weights=tf.float32, no_timestamp=False,
-                 conv_test = False, graph_reg_test = False):
-        super(TGCNN_layer, self).__init__()
-        #self.graphs_4D = list_to_4D_tensor(input_graphs)
+    def __init__(self, num_nodes, num_time_steps, num_filters, filter_size, stride, variable_gamma, 
+                 exponential_scaling, no_timestamp, parallel_iter=100, dtype_weights=tf.float32, **kwargs):
+        super(TGCNN_layer, self).__init__(**kwargs)
+
+        self.num_nodes = num_nodes
+        self.time_steps = num_time_steps # T = the temporal length of the graphs
         self.num_filters = num_filters
         self.filter_size = filter_size
         self.stride = stride
-        
-        self.num_nodes = num_nodes
-        self.time_steps = num_time_steps # T = the temporal length of the graphs
-        self.dtype_weights = dtype_weights
-        self.parallel_iter = parallel_iter
         self.variable_gamma = variable_gamma
         self.exponential_scaling = exponential_scaling
+        self.parallel_iter = parallel_iter
+        self.dtype_weights = dtype_weights
         self.no_timestamp = no_timestamp
         
         w_init = tf.random_normal_initializer(stddev = 0.05)#1e-3)
-
-        if conv_test == False and graph_reg_test == False:
-            self.w = tf.Variable(
-                initial_value=w_init(shape=(self.num_nodes*self.num_nodes*self.filter_size, self.num_filters)),
-                trainable=True, dtype=self.dtype_weights, name='3DCNN_Weights')
-        elif graph_reg_test == True and conv_test == False:
-            filt_complex = tf.constant([2.5, 1, 3, 0.5, 1, 3, 0.5, 1, 3, 0.5, 1, 
-                                3, 0.5, 1, 3, 0.5, 1, 3, 0.5, 1, 3, 0.5, 
-                                1, 3, 0.5, 1, 3])
-            self.w = tf.Variable(initial_value=tf.constant(filt_complex, dtype=self.dtype_weights),
-                                 trainable=True, dtype=self.dtype_weights)
-        elif conv_test == True and graph_reg_test == False:
-            self.w = tf.transpose(tf.constant([[1, 2, 3, 4, 5, 6, 7, 8], [-1, -2, -3, -4, -5, -6,-7, -8]], dtype=self.dtype_weights))
-        else:
-            print("Can't set two constant tensors for the filter, change either conv_test or graph_reg_test to False :)")
-
+        self.w = tf.Variable(
+            initial_value=w_init(shape=(self.num_nodes*self.num_nodes*self.filter_size, self.num_filters)),
+            trainable=True, dtype=self.dtype_weights, name='3dcnn_weights')
         
         g_init = tf.random_normal_initializer()
         if self.exponential_scaling & self.variable_gamma:
-            self.gammat = tf.Variable(initial_value=g_init(shape=(1,1)), trainable=True, dtype=self.dtype_weights,
-                                    name='Gammat')
+            self.gammat = tf.Variable(
+                initial_value=g_init(shape=(1,1)), 
+                trainable=True, dtype=self.dtype_weights, name='gammat')
+#         
+        else:
+#             self.gammat = tf.constant(1, dtype=tf.int64)
+            self.gammat = tf.Variable(
+                initial_value=tf.constant(1, dtype=tf.float32), 
+                trainable=False, dtype=self.dtype_weights, name='gammat')
+        print("normalised gamma", self.gammat.numpy())
+     
+    def get_config(self):
+        config = super(TGCNN_layer, self.get_config())
+        # save constructor arguments
+        config['num_nodes'] = self.num_nodes
+        config['time_steps'] = self.time_steps
+        config['num_filters'] = self.num_filters
+        config['filter_size'] = self.filter_size
+        config['stride'] = self.stride
+        config['variable_gamma'] = self.variable_gamma
+        config['exponential_scaling'] = self.exponential_scaling
+        config['parallel_iter'] = self.parallel_iter
+        config['dtype_weights'] = self.dtype_weights
+        config['no_timestamp'] = self.no_timestamp
         
-               
+        return config
+    
     def call(self, input_graphs):
         k = tf.constant(1, dtype=tf.int64)
         
         if self.exponential_scaling:
             if self.variable_gamma:
-                gamma_max = 10
-                gamma_min = 0
-                self.gammat = (gamma_max-gamma_min)*tf.nn.sigmoid(self.gammat)+gamma_min
-                #print(input_graphs)
-                #print(self.gammat)
-                #print(-self.gammat*input_graphs)
                 input_graphs = tf.sparse.map_values(tf.exp, -self.gammat*input_graphs) # all non-zero elements in sparse tensor (exp(-gamma*x))
             elif self.no_timestamp:
                 input_graphs = tf.sparse.map_values(tf.exp, 0)
@@ -82,13 +83,11 @@ class TGCNN_layer(tf.keras.layers.Layer):
         
         # Create features by building it up rather than starting with a fill array and replacing numbers
         # First slice matmul over all graphs 
-        #print(tf.shape(input_graphs))
         g = tf.sparse.reshape(
                 tf.sparse.slice(input_graphs, 
                                 [0, 0, 0, 0], 
                                 [input_graphs.dense_shape[0],  
                                  self.num_nodes, self.num_nodes, self.filter_size]), [-1,1]) 
-        #print(tf.shape(g))
         g = tf.sparse.reshape(g, [input_graphs.dense_shape[0], self.num_nodes*self.num_nodes*self.filter_size])
 
         g = tf.sparse.sparse_dense_matmul(g, self.w)
@@ -110,19 +109,14 @@ class TGCNN_layer(tf.keras.layers.Layer):
                                 [input_graphs.dense_shape[0], self.num_nodes*self.num_nodes*self.filter_size]), self.w),2),2)], 3) # concatenate to build output
             return k + self.stride, g
         
-        #shape_0 = 
         shape_1 = self.num_filters
-        #print(shape_1)
         shape_2 = 1
-        #print(shape_2)
         shape_3 = int(((self.time_steps - self.filter_size)/self.stride) +1)
-        #print(shape_3)
         _, g = tf.while_loop(lambda k, g: k < self.time_steps-self.filter_size+1, in_loop, [k, g], 
                       shape_invariants=[k.get_shape(), tf.TensorShape([None, None, None, None])], 
                       #shape_invariants=[k.get_shape(), tf.TensorShape([None, shape_1, shape_2, shape_3])],
                               parallel_iterations = self.parallel_iter, swap_memory=False) # k = counter
           
-        #print("g (output) shape when stride=", self.stride, ':', g.get_shape())
         return g
     
     
@@ -149,9 +143,8 @@ class TGCNN_layer(tf.keras.layers.Layer):
         return tf.norm(self.w, ord='euclidean')
 
     
+   
     
-
-
     def graph_reg(self):
         '''Structured L1-regularization to try enforce graph structure. 
             This penalises if there is no feeder event or prior connections.
@@ -185,7 +178,7 @@ class TGCNN_layer(tf.keras.layers.Layer):
                 prior_connection = tf.reduce_any(above_thres)
                 
                 if not prior_connection:
-                    deviances.append(tf.reduce_sum(tf.boolean_mask(Fiabs[k+1::filter_size], below_thres)))
+                    deviances.append(tf.reduce_sum(tf.boolean_mask(Fiabs[k::filter_size], below_thres)))
                 
                 k += 1
 
@@ -193,14 +186,7 @@ class TGCNN_layer(tf.keras.layers.Layer):
             
             return deviance.numpy()
 
-        # if graph_reg_test:
-        #     total_deviance = filter_deviance(self.w[:])
-        # else:
-        #     total_deviance = filter_deviance(self.w[:, 0]) # first filter weights
-        #     for featurenum in range(1, self.w.shape[1]): # loop through the number of filters
-        #         total_deviance += filter_deviance(self.w[:, featurenum])
-        # total_deviance = filter_deviance(self.w[:])
-        # print(self.w)
+
         try:
             total_deviance = filter_deviance(self.w[:, 0], self.filter_size) # first filter weights
             for featurenum in range(1, self.w.shape[1]): # loop through the number of filters

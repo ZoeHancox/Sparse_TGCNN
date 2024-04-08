@@ -1,3 +1,6 @@
 __pycache__
 .cache\
 lastfailed
+pred_proba_and_true
+recalibration/logits_and_outcome_csvs/
+recalibration/plots/

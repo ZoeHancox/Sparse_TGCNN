@@ -6,6 +6,7 @@ from tensorflow import keras
 import tensorflow as tf
 from src import TGCNN_layer
 
+
 class TGCNN_Model(tf.keras.Model):
     
     def __init__(self, num_filters=2, num_nodes=97, num_time_steps=100, 
@@ -56,7 +57,9 @@ class TGCNN_Model(tf.keras.Model):
         out = self.fcl2_short(x)
         return out
         
-    def call(self, inputs):
+    def call(self, inputs, demos):
+#         print("inputs:", inputs)
+#         print("demos", demos)
         if self.second_TGCNN_layer == False:
             x = self.tg_conv_layer1(inputs)
             #print("\n\nAfter 3DCNN layer out:", x)
@@ -75,6 +78,7 @@ class TGCNN_Model(tf.keras.Model):
                 out = self.flat_to_out(x)
                 #out = self.fcl_to_out(out)
 
+            out = tf.keras.layers.Concatenate()([out, demos])
             out = self.fcl_after_concat(out)
             out = self.activation(out)
             out = self.fcl_after_concat2(out)
@@ -121,7 +125,7 @@ class TGCNN_Model(tf.keras.Model):
              
             
             # concatenation of the two channels/streams
-            out = tf.keras.layers.Concatenate()([out_long, out_short])
+            out = tf.keras.layers.Concatenate()([out_long, out_short, demos])
             out = self.fcl_after_concat(out)
             out = self.activation(out)
             out = self.fcl_after_concat2(out)
@@ -130,4 +134,5 @@ class TGCNN_Model(tf.keras.Model):
             
             
             
+        
         return out
