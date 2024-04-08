@@ -136,7 +136,6 @@ compute_metrics <- function(df, linpreds, outcomes, bootstrapnum, test_type) {
   
   
   list_for_results <<- list(conf_matrix$overall['Accuracy'], conf_matrix$table['95% CI'], conf_matrix$byClass['Sensitivity'], conf_matrix$byClass['Specificity'], conf_matrix$byClass['Pos Pred Value'], conf_matrix$byClass['Neg Pred Value'], conf_matrix$byClass['Prevalence'], conf_matrix$byClass['Detection Rate'], conf_matrix$byClass['Detection Prevalence'], conf_matrix$byClass['Balanced Accuracy'], mean(oelist), list(oe_CI), sd(oelist), mean(cslopelist), list(cslope_CI), sd(cslopelist), mean(citllist), list(CITL_CI), sd(citllist), mean(auclist), list(AUROC_CI), sd(auclist), mean(auprc_list), list(AUPRC_CI), sd(auprc_list))
-  #print(list_for_results)
   new_row_df <- as.data.frame(t(unlist(list_for_results, recursive=FALSE)))
   
   colnames(new_row_df) <- colnames(empty_df)
@@ -227,7 +226,6 @@ include_subgroup <- readline(prompt = "Do you want to perform subgroup analysis 
 
 # Read in the logits and outcomes
 df <- read.csv(paste('logits_and_outcome_csvs/', 'logits_', model_name,'_holdout_1.csv', sep=''))
-#head(df)
 
 # Before recal
 compute_metrics(df, df$logit, df$outcome, 10, 'before')
