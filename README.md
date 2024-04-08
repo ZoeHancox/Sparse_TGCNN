@@ -22,7 +22,7 @@ The code repository structure:
 ├── src                                 # Source files
 ├────> create_fake_patients.py          # Generate fake patient data to use in model
 ├────> TGCNN_layer.py                   # Sparse 3D CNN layer 
-├────> trnvaltst_sigmoid_oned.py        # Train, validate and test functions for multilabel outcomes
+├────> trnvaltst.py                     # Train, validate and test functions for multilabel outcomes
 ├────> trnvaltst_sigmoid_oned.py        # Train, validate and test functions for binary outcomes
 ├────> utils.py                         # Helpful functions
 ├────> plot_figures.py                  # Some more helpful functions for plotting figures
