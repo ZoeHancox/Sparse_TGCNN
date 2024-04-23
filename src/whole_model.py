@@ -19,21 +19,21 @@ class TGCNN_Model(tf.keras.Model):
         
         self.tg_conv_layer1 = TGCNN_layer.TGCNN_layer(num_filters=num_filters, num_nodes=num_nodes, num_time_steps=num_time_steps, 
                                          filter_size=filter_size, variable_gamma=variable_gamma, exponential_scaling=exponential_scaling,
-                                         stride=stride, no_timestamp=no_timestamp) #stride is probably>2 so this is the shorter stream 
+                                         stride=stride, no_timestamp=no_timestamp, name='tg_conv_layer1') #stride is probably>2 so this is the shorter stream 
         if second_TGCNN_layer==True:
             self.tg_conv_layer2 = TGCNN_layer.TGCNN_layer(num_filters=num_filters, num_nodes=num_nodes, num_time_steps=num_time_steps, 
                                          filter_size=filter_size, variable_gamma=variable_gamma, exponential_scaling=exponential_scaling,
-                                         stride=2, no_timestamp=no_timestamp)
+                                         stride=2, no_timestamp=no_timestamp, name='tg_conv_layer2')
         
         self.batchnorm1 = tf.keras.layers.BatchNormalization()
         self.batchnorm2 = tf.keras.layers.BatchNormalization()
         
         if activation_type == "relu" or "gelu":
-            self.activation = tf.keras.layers.Activation(activation_type)
+            self.activation = tf.keras.layers.Activation(activation_type, name=activation_type)
         elif activation_type == "LeakyReLU":
-            self.activation = tf.keras.layers.LeakyReLU()
+            self.activation = tf.keras.layers.LeakyReLU(name='LeakyReLU')
         
-        self.lstm = tf.keras.layers.LSTM(units=lstm_units) # input shape must be 3D with shape [batch,timesteps,feature]
+        self.lstm = tf.keras.layers.LSTM(units=lstm_units, name='LSTM') # input shape must be 3D with shape [batch,timesteps,feature]
         self.flatten = tf.keras.layers.Flatten()
         self.fcl1_short = tf.keras.layers.Dense(units=fcl1_units, activation=activation_type)
         self.fcl1_long = tf.keras.layers.Dense(units=fcl1_units, activation=activation_type)
