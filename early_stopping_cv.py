@@ -91,9 +91,9 @@ class EarlyStopping:
                 test_auc_list.append(test_auc)
                 test_f1_list.append(test_f1)
                 
-            # Checking the probability distributions and outcome distribution on the final batch   
-            plot_figures.draw_confusion_mat(y_batch_test, test_logits, ['none','hip'], run_name=None, ran_search_num=2222, data_type="T")
-            plot_figures.draw_calibration_curve(y_batch_test, test_logits, run_name=None, ran_search_num=2222)
+            # # Checking the probability distributions and outcome distribution on the final batch   
+            # plot_figures.draw_confusion_mat(y_batch_test, test_logits, ['none','hip'], run_name=None, ran_search_num=2222, data_type="T")
+            # plot_figures.draw_calibration_curve(y_batch_test, test_logits, run_name=None, ran_search_num=2222)
             
             test_logits = tf.concat(test_logits_list, axis=0)
             demo_list = tf.concat(test_demo_list, axis=0)
