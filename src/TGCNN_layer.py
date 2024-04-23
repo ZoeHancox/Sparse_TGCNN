@@ -20,8 +20,8 @@ class TGCNN_layer(tf.keras.layers.Layer):
     """
     
     def __init__(self, num_nodes, num_time_steps, num_filters, filter_size, stride, variable_gamma, 
-                 exponential_scaling, no_timestamp, parallel_iter=100, dtype_weights=tf.float32, **kwargs):
-        super(TGCNN_layer, self).__init__(**kwargs)
+                 exponential_scaling, no_timestamp, parallel_iter=100, dtype_weights=tf.float32, name=None, **kwargs):
+        super(TGCNN_layer, self).__init__(name=name, **kwargs)
 
         self.num_nodes = num_nodes
         self.time_steps = num_time_steps # T = the temporal length of the graphs
