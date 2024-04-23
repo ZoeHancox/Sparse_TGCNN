@@ -4,3 +4,4 @@ lastfailed
 pred_proba_and_true
 recalibration/logits_and_outcome_csvs/
 recalibration/plots/
+results/cross_validation_results.csv
