@@ -66,13 +66,10 @@ class TGCNN_Model(tf.keras.Model):
             x = tf.squeeze(x, axis=2)
             #print("Just before LSTM:", x)
             
-            if self.LSTM_ablation: # with no LSTM layer
-                out = self.flat_to_out(x)
-                #out = self.fcl_to_out(out)
-            else: # with LSTM layer
+            if self.LSTM_ablation == False: # with LSTM layer
                 x = tf.transpose(x, perm=[0,2,1]) # switch axis 1 and 2 for LSTM input
                 x = self.lstm(x)
-                out = self.flat_to_out(x)
+            out = self.flat_to_out(x)
                 #out = self.fcl_to_out(out)
 
             out = self.fcl_after_concat(out)
@@ -89,20 +86,15 @@ class TGCNN_Model(tf.keras.Model):
             x_long = self.batchnorm1(x_long)
             x_long = self.activation(x_long)
             x_long = tf.squeeze(x_long, axis=2)
-            if self.LSTM_ablation: # remove the LSTM layer
-                x_long = self.flatten(x_long)
-                x_long = self.dropout(x_long)
-                x_long = self.fcl1_long(x_long)
-                x_long = self.dropout(x_long)
-                out_long = self.fcl2_long(x_long)
-            else: # without removing LSTM layer
+            
+            if self.LSTM_ablation == False: # with LSTM layer
                 x_long = tf.transpose(x_long, perm=[0,2,1]) # switch axis 1 and 2 for LSTM input
                 x_long = self.lstm(x_long)
-                x_long = self.flatten(x_long)
-                x_long = self.dropout(x_long)
-                x_long = self.fcl1_long(x_long)
-                x_long = self.dropout(x_long)
-                out_long = self.fcl2_long(x_long)
+            x_long = self.flatten(x_long)
+            x_long = self.dropout(x_long)
+            x_long = self.fcl1_long(x_long)
+            x_long = self.dropout(x_long)
+            out_long = self.fcl2_long(x_long)
                 
            
             # short stream (stride = 2)#####################
@@ -110,13 +102,11 @@ class TGCNN_Model(tf.keras.Model):
             x_short = self.batchnorm2(x_short)
             x_short = self.activation(x_short)
             x_short = tf.squeeze(x_short, axis=2)
-            if self.LSTM_ablation: # remove the LSTM layer
-                out_short = self.flat_to_out(x_short)
-                
-            else: # without removing LSTM layer
+                            
+            if self.LSTM_ablation == False: # with LSTM layer
                 x_short = tf.transpose(x_short, perm=[0,2,1]) # switch axis 1 and 2 for LSTM input
                 x_short = self.lstm(x_short)
-                out_short = self.flat_to_out(x_short)
+            out_short = self.flat_to_out(x_short)
             
              
             
