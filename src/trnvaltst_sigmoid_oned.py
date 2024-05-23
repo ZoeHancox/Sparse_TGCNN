@@ -35,13 +35,13 @@ def model_metrics(y_true, dummy_pred, logits):
 
     auc = 0
     try:
-        auc = roc_auc_score(y_true, dummy_pred, average='weighted', multi_class='ovo')
+        auc = roc_auc_score(y_true, dummy_pred, average='weighted')
     except ValueError:
         pass
 
     indiv_auc = 0
     try:
-        indiv_auc = roc_auc_score(y_true, dummy_pred, average=None, multi_class='ovo')
+        indiv_auc = roc_auc_score(y_true, dummy_pred, average=None)
     except ValueError:
         pass
 
