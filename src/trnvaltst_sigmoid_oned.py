@@ -28,10 +28,8 @@ def model_metrics(y_true, dummy_pred, logits):
     acc = accuracy_score(y_true, dummy_pred)
 
     prec = precision_score(y_true, dummy_pred, average='weighted', zero_division=1)
-    indiv_prec = precision_score(y_true, dummy_pred, average=None, zero_division=1)
 
     recall = recall_score(y_true, dummy_pred, average='weighted', zero_division=1)
-    indiv_recall = recall_score(y_true, dummy_pred, average=None, zero_division=1)
 
     auc = 0
     try:
@@ -39,18 +37,11 @@ def model_metrics(y_true, dummy_pred, logits):
     except ValueError:
         pass
 
-    indiv_auc = 0
-    try:
-        indiv_auc = roc_auc_score(y_true, dummy_pred, average=None)
-    except ValueError:
-        pass
-
     f1 = f1_score(y_true, dummy_pred, average='weighted', zero_division=1)
-    indiv_f1 = f1_score(y_true, dummy_pred, average=None, zero_division=1)
 
     cal_slope = utils.calibration_slope(y_true, logits)
 
-    return acc, prec, indiv_prec, recall, indiv_recall, auc, indiv_auc, f1, indiv_f1, cal_slope
+    return acc, prec, recall, auc, f1, cal_slope
 
 
 def train_step(x, y_batch_train, trn_demo_vals, reg_strength, class_weights, model, L1_ablation, L2_ablation, graph_reg_strength, graph_reg_incl, exponential_scaling, weighted_loss, variable_gamma, optimizer, demo):
@@ -103,14 +94,10 @@ def train_step(x, y_batch_train, trn_demo_vals, reg_strength, class_weights, mod
     #trained_weights = model.get_weights()
     #print("Trained weights:", trained_weights)
     
-    acc, prec, indiv_prec, recall, indiv_recall, auc, indiv_auc, f1, indiv_f1, cal_slope = model_metrics(y_batch_train, dummy_pred, trn_logits)
+    acc, prec, recall, auc, f1, cal_slope = model_metrics(y_batch_train, dummy_pred, trn_logits)
     
    
-    return trn_logits, trn_loss, acc, prec, recall, auc, f1, indiv_prec, indiv_recall, indiv_auc, indiv_f1, cal_slope, model    
-    
-    
-    
-    
+    return trn_logits, trn_loss, acc, prec, recall, auc, f1, cal_slope, model    
     
     
     
@@ -145,9 +132,9 @@ def val_step(x, y, test_demo_vals, reg_strength,class_weights,model,L1_ablation,
         val_loss += graph_reg_strength * scaled_deviance
     
     
-    acc, prec, indiv_prec, recall, indiv_recall, auc, indiv_auc, f1, indiv_f1, cal_slope = model_metrics(y, dummy_pred, val_logits)
+    acc, prec, recall, auc, f1, cal_slope = model_metrics(y, dummy_pred, val_logits)
     
     
     
    
-    return val_logits, val_loss, acc, prec, recall, auc, f1, indiv_prec, indiv_recall, indiv_auc, indiv_f1, cal_slope, model
+    return val_logits, val_loss, acc, prec, recall, auc, f1, cal_slope, model
