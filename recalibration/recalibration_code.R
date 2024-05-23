@@ -315,6 +315,77 @@ if (include_subgroup=='y'){
   curdf <- unseen_df[unseen_df$age_at_label > 70, ]
   compute_metrics(curdf, curdf$lpnew, curdf$outcome, bootstrapnum, 'unseen')
   mainplots(curdf, curdf$lpnew, curdf$outcome, paste('plots/subgroups/age_above_70', model_name, sep='_'))
+
+  # BMI GROUP
+  print('BMI SPLIT - UNDERWEIGHT')
+  curdf <- unseen_df[unseen_df$bmi_int == 1,]
+  compute_metrics(curdf, curdf$lpnew, curdf$outcome, bootstrapnum, 'unseen')
+  mainplots(curdf, curdf$lpnew, curdf$outcome, paste('plots/subgroups/bmi_underweight', model_name, sep='_'))
+
+  print('BMI SPLIT - HEALTHY')
+  curdf <- unseen_df[unseen_df$bmi_int == 2,]
+  compute_metrics(curdf, curdf$lpnew, curdf$outcome, bootstrapnum, 'unseen')
+  mainplots(curdf, curdf$lpnew, curdf$outcome, paste('plots/subgroups/bmi_healthy', model_name, sep='_'))
+
+  print('BMI SPLIT - OVERWEIGHT')
+  curdf <- unseen_df[unseen_df$bmi_int == 3,]
+  compute_metrics(curdf, curdf$lpnew, curdf$outcome, bootstrapnum, 'unseen')
+  mainplots(curdf, curdf$lpnew, curdf$outcome, paste('plots/subgroups/bmi_overweight', model_name, sep='_'))
+
+  print('BMI SPLIT - OBESE')
+  curdf <- unseen_df[unseen_df$bmi_int == 4,]
+  compute_metrics(curdf, curdf$lpnew, curdf$outcome, bootstrapnum, 'unseen')
+  mainplots(curdf, curdf$lpnew, curdf$outcome, paste('plots/subgroups/bmi_obese', model_name, sep='_'))
+  
+  print('BMI SPLIT - SEVERELY OBESE')
+  curdf <- unseen_df[unseen_df$bmi_int == 5,]
+  compute_metrics(curdf, curdf$lpnew, curdf$outcome, bootstrapnum, 'unseen')
+  mainplots(curdf, curdf$lpnew, curdf$outcome, paste('plots/subgroups/bmi_severely_obese', model_name, sep='_'))
+
+  # print('BMI SPLIT - MISSING')
+  # curdf <- unseen_df[unseen_df$bmi_int == 0,]
+  # compute_metrics(curdf, curdf$lpnew, curdf$outcome, bootstrapnum, 'unseen')
+  # mainplots(curdf, curdf$lpnew, curdf$outcome, paste('plots/subgroups/bmi_missing', model_name, sep='_'))
+  
+  # FOLLOW UP TIME ANALYSIS
+  # Note some follow-up time periods won't be relevant e.g. after 10 years for
+  # 5 years in advance for case patients
+  
+  print('FOLLOW UP TIME SPLIT - 0-2 years')
+  curdf <- unseen_df[unseen_df$last_200_timesteps_years >= 0 & unseen_df$last_200_timesteps_years < 2, ]
+  compute_metrics(curdf, curdf$lpnew, curdf$outcome, bootstrapnum, 'unseen')
+  mainplots(curdf, curdf$lpnew, curdf$outcome, paste('plots/subgroups/0_2_years_follow_up', model_name, sep='_'))
+  
+  print('FOLLOW UP TIME SPLIT - 2-4 years')
+  curdf <- unseen_df[unseen_df$last_200_timesteps_years >= 2 & unseen_df$last_200_timesteps_years < 4, ]
+  compute_metrics(curdf, curdf$lpnew, curdf$outcome, bootstrapnum, 'unseen')
+  mainplots(curdf, curdf$lpnew, curdf$outcome, paste('plots/subgroups/2_4_years_follow_up', model_name, sep='_'))
+  
+  print('FOLLOW UP TIME SPLIT - 4-6 years')
+  curdf <- unseen_df[unseen_df$last_200_timesteps_years >= 4 & unseen_df$last_200_timesteps_years < 6, ]
+  compute_metrics(curdf, curdf$lpnew, curdf$outcome, bootstrapnum, 'unseen')
+  mainplots(curdf, curdf$lpnew, curdf$outcome, paste('plots/subgroups/4_6_years_follow_up', model_name, sep='_'))
+  
+  print('FOLLOW UP TIME SPLIT - 6-8 years')
+  curdf <- unseen_df[unseen_df$last_200_timesteps_years >= 6 & unseen_df$last_200_timesteps_years < 8, ]
+  compute_metrics(curdf, curdf$lpnew, curdf$outcome, bootstrapnum, 'unseen')
+  mainplots(curdf, curdf$lpnew, curdf$outcome, paste('plots/subgroups/6_8_years_follow_up', model_name, sep='_'))
+  
+  print('FOLLOW UP TIME SPLIT - 8-10 years')
+  curdf <- unseen_df[unseen_df$last_200_timesteps_years >= 8 & unseen_df$last_200_timesteps_years < 10, ]
+  compute_metrics(curdf, curdf$lpnew, curdf$outcome, bootstrapnum, 'unseen')
+  mainplots(curdf, curdf$lpnew, curdf$outcome, paste('plots/subgroups/8_10_years_follow_up', model_name, sep='_'))
+  
+  print('FOLLOW UP TIME SPLIT - 10-12 years')
+  curdf <- unseen_df[unseen_df$last_200_timesteps_years >= 10 & unseen_df$last_200_timesteps_years < 12, ]
+  compute_metrics(curdf, curdf$lpnew, curdf$outcome, bootstrapnum, 'unseen')
+  mainplots(curdf, curdf$lpnew, curdf$outcome, paste('plots/subgroups/10_12_years_follow_up', model_name, sep='_'))
+  
+  print('FOLLOW UP TIME SPLIT - 12-15 years')
+  curdf <- unseen_df[unseen_df$last_200_timesteps_years >= 12 & unseen_df$last_200_timesteps_years <= 15, ]
+  compute_metrics(curdf, curdf$lpnew, curdf$outcome, bootstrapnum, 'unseen')
+  mainplots(curdf, curdf$lpnew, curdf$outcome, paste('plots/subgroups/12_15_years_follow_up', model_name, sep='_'))
+  
   
 }
 
