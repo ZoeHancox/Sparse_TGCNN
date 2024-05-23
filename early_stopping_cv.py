@@ -31,7 +31,7 @@ class EarlyStopping:
 
              
         
-    def __call__(self, val_loss, train_batch_losses, val_batch_loss, train_cal_slope, val_cal_slope, train_batch_acc, val_batch_acc, train_batch_auc, val_batch_auc, train_auc_indiv_ave, val_auc_indiv_ave, train_batch_prec, val_batch_prec, train_prec_indiv_ave, val_prec_indiv_ave, train_batch_recall, val_batch_recall, train_recall_indiv_ave, val_recall_indiv_ave, train_batch_f1, val_batch_f1, train_f1_indiv_ave, val_f1_indiv_ave, model, run_name, batched_graphs_holdout, batched_labels_holdout, batched_holdout_indices, batched_graphs_holdout2, batched_labels_holdout2, batched_holdout2_indices, reg_strength, class_weights, L1_ablation, L2_ablation, graph_reg_strength, graph_reg_incl, weighted_loss, improved_acc, test_patients, recal_test_patients, demo):
+    def __call__(self, val_loss, train_batch_losses, val_batch_loss, train_cal_slope, val_cal_slope, train_batch_acc, val_batch_acc, train_batch_auc, val_batch_auc, train_batch_prec, val_batch_prec, train_batch_recall, val_batch_recall, train_batch_f1, val_batch_f1, model, run_name, batched_graphs_holdout, batched_labels_holdout, batched_holdout_indices, batched_graphs_holdout2, batched_labels_holdout2, batched_holdout2_indices, reg_strength, class_weights, L1_ablation, L2_ablation, graph_reg_strength, graph_reg_incl, weighted_loss, improved_acc, test_patients, recal_test_patients, demo):
 
         score = -val_loss
 
@@ -73,7 +73,7 @@ class EarlyStopping:
                     holdout_demo_vals = None
                 
                 test_logits, test_loss, test_acc, test_prec, test_recall, test_auc, test_f1, \
-                indiv_test_prec, indiv_test_recall, indiv_test_auc, indiv_test_f1, test_cal_slope, model, \
+                test_cal_slope, model, \
                 = trnvaltst_sigmoid_oned.val_step(x_batch_test, y_batch_test, holdout_demo_vals, reg_strength,
                                             class_weights, model, L1_ablation, L2_ablation,
                                              graph_reg_strength, graph_reg_incl, weighted_loss, demo)
@@ -109,7 +109,7 @@ class EarlyStopping:
                 np.save(f, demo_list)    
                 
             print("\nTEST/HOLDOUT METRICS:")
-            print(f"Test individual AUC scores: {np.mean(test_auc_list):.4f}")
+            print(f"Test AUC score: {np.mean(test_auc_list):.4f}")
             print(f"Test calibration: {np.mean(test_cal_slope_list) :.4f}")
             print(f"Test accuracy: {np.mean(test_acc_list) :.4%}")
             print(f"Test Recall: {np.mean(test_recall_list):.4f}")
@@ -130,7 +130,7 @@ class EarlyStopping:
                     holdout2_demo_vals = None
                 
                 test2_logits, test2_loss, test2_acc, test2_prec, test2_recall, test2_auc, test2_f1, \
-                indiv_test2_prec, indiv_test2_recall, indiv_test2_auc, indiv_test2_f1, test2_cal_slope, model, \
+                test2_cal_slope, model, \
                 = trnvaltst_sigmoid_oned.val_step(x_batch_test2, y_batch_test2, holdout2_demo_vals, reg_strength,
                                             class_weights, model, L1_ablation, L2_ablation,
                                              graph_reg_strength, graph_reg_incl, weighted_loss, demo)                               
@@ -154,7 +154,7 @@ class EarlyStopping:
         
         
         
-    def print_checkpoint_metric(self, train_batch_losses, val_batch_loss, train_cal_slope, val_cal_slope, train_batch_acc, val_batch_acc, train_batch_auc, val_batch_auc, train_auc_indiv_ave, val_auc_indiv_ave, train_batch_prec, val_batch_prec, train_prec_indiv_ave, val_prec_indiv_ave, train_batch_recall, val_batch_recall, train_recall_indiv_ave, val_recall_indiv_ave, train_batch_f1, val_batch_f1, train_f1_indiv_ave, val_f1_indiv_ave):
+    def print_checkpoint_metric(self, train_batch_losses, val_batch_loss, train_cal_slope, val_cal_slope, train_batch_acc, val_batch_acc, train_batch_auc, val_batch_auc, train_batch_prec, val_batch_prec, train_batch_recall, val_batch_recall, train_batch_f1, val_batch_f1):
         
         checkpoint_train_loss = np.mean(train_batch_losses)
         checkpoint_val_loss = np.mean(val_batch_loss)
@@ -168,26 +168,15 @@ class EarlyStopping:
         checkpoint_train_auc = np.mean(train_batch_auc)
         checkpoint_val_auc = np.mean(val_batch_auc)
         
-        checkpoint_train_auc_indiv = train_auc_indiv_ave
-        checkpoint_val_auc_indiv = val_auc_indiv_ave
-        
         checkpoint_train_prec = np.mean(train_batch_prec)
         checkpoint_val_prec = np.mean(val_batch_prec)
-        
-        checkpoint_train_prec_indiv = train_prec_indiv_ave
-        checkpoint_val_prec_indiv = val_prec_indiv_ave
         
         checkpoint_train_recall = np.mean(train_batch_recall)
         checkpoint_val_recall = np.mean(val_batch_recall)
         
-        checkpoint_train_recall_indiv = train_recall_indiv_ave
-        checkpoint_val_recall_indiv = val_recall_indiv_ave
-        
         checkpoint_train_f1 = np.mean(train_batch_f1)
         checkpoint_val_f1 = np.mean(val_batch_f1)
         
-        checkpoint_train_f1_indiv = train_f1_indiv_ave
-        checkpoint_val_f1_indiv = val_f1_indiv_ave
         
-        return checkpoint_train_loss, checkpoint_val_loss, checkpoint_train_cal_slope, checkpoint_val_cal_slope, checkpoint_train_acc, checkpoint_val_acc, checkpoint_train_auc, checkpoint_val_auc, checkpoint_train_auc_indiv, checkpoint_val_auc_indiv, checkpoint_train_prec, checkpoint_val_prec, checkpoint_train_prec_indiv, checkpoint_val_prec_indiv, checkpoint_train_recall, checkpoint_val_recall, checkpoint_train_recall_indiv, checkpoint_val_recall_indiv, checkpoint_train_f1, checkpoint_val_f1, checkpoint_train_f1_indiv, checkpoint_val_f1_indiv
+        return checkpoint_train_loss, checkpoint_val_loss, checkpoint_train_cal_slope, checkpoint_val_cal_slope, checkpoint_train_acc, checkpoint_val_acc, checkpoint_train_auc, checkpoint_val_auc, checkpoint_train_prec, checkpoint_val_prec, checkpoint_train_recall, checkpoint_val_recall, checkpoint_train_f1, checkpoint_val_f1,
 
