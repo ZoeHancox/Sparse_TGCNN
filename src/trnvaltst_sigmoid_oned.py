@@ -27,17 +27,17 @@ def model_metrics(y_true, dummy_pred, logits):
     """
     acc = accuracy_score(y_true, dummy_pred)
 
-    prec = precision_score(y_true, dummy_pred, average='weighted', zero_division=1)
+    prec = precision_score(y_true, dummy_pred, average='binary', zero_division=1, pos_label=1)
 
-    recall = recall_score(y_true, dummy_pred, average='weighted', zero_division=1)
+    recall = recall_score(y_true, dummy_pred, average='binary', zero_division=1, pos_label=1)
 
     auc = 0
     try:
-        auc = roc_auc_score(y_true, dummy_pred, average='weighted')
+        auc = roc_auc_score(y_true, dummy_pred, average=None)
     except ValueError:
         pass
 
-    f1 = f1_score(y_true, dummy_pred, average='weighted', zero_division=1)
+    f1 = f1_score(y_true, dummy_pred, average='binary', zero_division=1, pos_label=1)
 
     cal_slope = utils.calibration_slope(y_true, logits)
 
