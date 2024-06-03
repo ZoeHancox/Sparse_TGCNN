@@ -23,7 +23,7 @@ def convert_logits_to_probs(logits, y_true):
 
 def model_metrics(y_true, dummy_pred, logits):
     """
-    Gets the accuracy, precision, recall, AUROC, F1 score and calibration slope values for the model.
+    Gets the accuracy, precision, recall, AUROC, and F1 score for the model.
     """
     acc = accuracy_score(y_true, dummy_pred)
 
@@ -39,9 +39,8 @@ def model_metrics(y_true, dummy_pred, logits):
 
     f1 = f1_score(y_true, dummy_pred, average='binary', zero_division=1, pos_label=1)
 
-    cal_slope = utils.calibration_slope(y_true, logits)
 
-    return acc, prec, recall, auc, f1, cal_slope
+    return acc, prec, recall, auc, f1
 
 
 def train_step(x, y_batch_train, trn_demo_vals, reg_strength, class_weights, model, L1_ablation, L2_ablation, graph_reg_strength, graph_reg_incl, exponential_scaling, weighted_loss, variable_gamma, optimizer, demo):
@@ -94,10 +93,10 @@ def train_step(x, y_batch_train, trn_demo_vals, reg_strength, class_weights, mod
     #trained_weights = model.get_weights()
     #print("Trained weights:", trained_weights)
     
-    acc, prec, recall, auc, f1, cal_slope = model_metrics(y_batch_train, dummy_pred, trn_logits)
+    acc, prec, recall, auc, f1 = model_metrics(y_batch_train, dummy_pred, trn_logits)
     
    
-    return trn_logits, trn_loss, acc, prec, recall, auc, f1, cal_slope, model    
+    return trn_logits, trn_loss, acc, prec, recall, auc, f1, model    
     
     
     
@@ -132,9 +131,9 @@ def val_step(x, y, test_demo_vals, reg_strength,class_weights,model,L1_ablation,
         val_loss += graph_reg_strength * scaled_deviance
     
     
-    acc, prec, recall, auc, f1, cal_slope = model_metrics(y, dummy_pred, val_logits)
+    acc, prec, recall, auc, f1 = model_metrics(y, dummy_pred, val_logits)
     
     
     
    
-    return val_logits, val_loss, acc, prec, recall, auc, f1, cal_slope, model
+    return val_logits, val_loss, acc, prec, recall, auc, f1, model
