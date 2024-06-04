@@ -111,8 +111,8 @@ def prob_histo(probabilities, true_y):
     ax2 = ax1.twinx()
 
     # Plot the countplot of true_y on the second y-axis
-    true_y = np.concatenate(true_y)
-    true_y_df = pd.DataFrame({'true': true_y})
+    #true_y = np.concatenate(true_y)
+    #true_y_df = pd.DataFrame({'true': true_y})
     sns.histplot(true_y, bins=2, kde=False, color='blue', alpha=0.3, label='True', ax=ax2)
     #sns.countplot(x='true', data=true_y_df, color='blue', alpha=0.4, label='True', ax=ax2)
     
