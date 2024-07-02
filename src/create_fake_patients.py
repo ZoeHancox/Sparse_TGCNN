@@ -42,7 +42,9 @@ def create_fake_patient_df(num_patients, max_events, max_nodes):
             'gender':0,
             'imd_quin':0,
             'age_at_label_event':0,
-            'replace_type': 'n'}
+            'replace_type': 'n',
+            'indices_len':0
+            }
 
     # create a Pandas DataFrame from the dictionary
     df = pd.DataFrame(data)
@@ -70,6 +72,7 @@ def create_fake_patient_df(num_patients, max_events, max_nodes):
     df['imd_quin'] = imd_list
     df['age_at_label_event'] = age_list
     df['replace_type'] = replace_list
+    df['indices_len'] = df['indices'].apply(lambda x: len(x))
 
     return df
 
