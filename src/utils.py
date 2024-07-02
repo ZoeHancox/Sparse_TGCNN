@@ -381,6 +381,7 @@ def convert_demos_to_tensor(df, indices, demo):
         demo_tensor (Tensor): values for demographic data.
     """
 
+    # get the rows of data relative to the indices for the batch
     demos = df[['gender', 'imd_quin', 'age_at_label_event']].iloc[indices]
     demos_z = demos.copy()
     demos_z['age_zscore'] = demos_z[['age_at_label_event']].apply(stats.zscore)
@@ -392,8 +393,12 @@ def convert_demos_to_tensor(df, indices, demo):
     demo_list = demo[['gender', 'imd_quin', 'age_at_label_event']].values.tolist()
     demo_tensor = tf.convert_to_tensor(demo_vals)
 
+    #pat_num_col = df['patientnum'].apply(pd.to_numeric)
+    pat_num_list = df['user'].apply(pd.to_numeric).iloc[indices].values.tolist() #needs to be valid column name e.g. 'patientnum' or 'users'
+    #print(pat_num_list)
+
     
-    return demo_tensor, demo_list
+    return demo_tensor, demo_list, pat_num_list
 
 def calibration_slope(true_y, logits):
     """
