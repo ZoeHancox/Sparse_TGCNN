@@ -31,13 +31,19 @@ class EarlyStopping:
 
              
         
-    def __call__(self, val_loss, train_batch_losses, val_batch_loss, train_cal_slope, val_cal_slope, train_batch_acc, val_batch_acc, train_batch_auc, val_batch_auc, train_batch_prec, val_batch_prec, train_batch_recall, val_batch_recall,  train_batch_f1, val_batch_f1, model, run_name, batched_graphs_holdout, batched_labels_holdout, batched_holdout_indices, batched_graphs_holdout2, batched_labels_holdout2, batched_holdout2_indices, reg_strength, class_weights, L1_ablation, L2_ablation, graph_reg_strength, graph_reg_incl, weighted_loss, improved_acc, test_patients, recal_test_patients, demo):
+    def __call__(self, val_loss, train_batch_losses, val_batch_loss, train_cal_slope, val_cal_slope, train_batch_acc, val_batch_acc, 
+                 train_batch_auc, val_batch_auc, train_batch_prec, val_batch_prec, train_batch_recall, val_batch_recall,  train_batch_f1, 
+                 val_batch_f1, model, run_name, batched_graphs_holdout, batched_labels_holdout, batched_holdout_indices, batched_graphs_holdout2, 
+                 batched_labels_holdout2, batched_holdout2_indices, reg_strength, class_weights, L1_ablation, L2_ablation, graph_reg_strength, 
+                 graph_reg_incl, weighted_loss, improved_acc, test_patients, recal_test_patients, demo, save_filters):
 
         score = -val_loss
 
         if self.best_score is None:
             self.best_score = score
-            self.save_checkpoint(val_loss, model, run_name, batched_graphs_holdout, batched_labels_holdout, batched_holdout_indices,batched_graphs_holdout2, batched_labels_holdout2, batched_holdout2_indices, reg_strength, class_weights, L1_ablation, L2_ablation, graph_reg_strength, graph_reg_incl, weighted_loss, improved_acc, test_patients, recal_test_patients, demo)
+            self.save_checkpoint(val_loss, model, run_name, batched_graphs_holdout, batched_labels_holdout, batched_holdout_indices,batched_graphs_holdout2, 
+                                 batched_labels_holdout2, batched_holdout2_indices, reg_strength, class_weights, L1_ablation, L2_ablation, graph_reg_strength, 
+                                 graph_reg_incl, weighted_loss, improved_acc, test_patients, recal_test_patients, demo, save_filters)
             self.checkpoint_made = True
         elif score < self.best_score + self.delta:
             self.counter += 1
@@ -49,17 +55,22 @@ class EarlyStopping:
             self.checkpoint_made = False
         else:
             self.best_score = score
-            self.save_checkpoint(val_loss, model, run_name, batched_graphs_holdout, batched_labels_holdout, batched_holdout_indices, batched_graphs_holdout2, batched_labels_holdout2, batched_holdout2_indices, reg_strength, class_weights, L1_ablation, L2_ablation, graph_reg_strength, graph_reg_incl, weighted_loss, improved_acc, test_patients, recal_test_patients, demo)
+            self.save_checkpoint(val_loss, model, run_name, batched_graphs_holdout, batched_labels_holdout, batched_holdout_indices, batched_graphs_holdout2, 
+                                 batched_labels_holdout2, batched_holdout2_indices, reg_strength, class_weights, L1_ablation, L2_ablation, graph_reg_strength, 
+                                 graph_reg_incl, weighted_loss, improved_acc, test_patients, recal_test_patients, demo, save_filters)
             self.counter = 0
             self.checkpoint_made =True
         
-    def save_checkpoint(self, val_loss, model, run_name, batched_graphs_holdout, batched_labels_holdout, batched_holdout_indices, batched_graphs_holdout2, batched_labels_holdout2, batched_holdout2_indices, reg_strength, class_weights, L1_ablation, L2_ablation, graph_reg_strength, graph_reg_incl, weighted_loss, improved_acc, test_patients, recal_test_patients, demo):
+    def save_checkpoint(self, val_loss, model, run_name, batched_graphs_holdout, batched_labels_holdout, batched_holdout_indices, batched_graphs_holdout2, 
+                        batched_labels_holdout2, batched_holdout2_indices, reg_strength, class_weights, L1_ablation, L2_ablation, graph_reg_strength, 
+                        graph_reg_incl, weighted_loss, improved_acc, test_patients, recal_test_patients, demo, save_filters):
         '''Saves model when validation loss decreases.'''
         if self.verbose:
             self.trace_func(f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).')
         self.val_loss_min = val_loss # replace the lowest loss value with the new lowest loss value
-        with open('../model_explainability/cnn_filters/'+run_name+'_filter.npy', 'wb') as f:
-            np.save(f, model.tg_conv_layer1.trainable_weights[0].numpy())
+        if save_filters:
+            with open('../model_explainability/cnn_filters/'+run_name+'_filter.npy', 'wb') as f:
+                np.save(f, model.tg_conv_layer1.trainable_weights[0].numpy())
         
         if improved_acc:
             test_logits_list, test_demo_list, test_pat_num_list = [], [], []
@@ -168,7 +179,9 @@ class EarlyStopping:
         
         
         
-    def print_checkpoint_metric(self, train_batch_losses, val_batch_loss, train_cal_slope, val_cal_slope, train_batch_acc, val_batch_acc, train_batch_auc, val_batch_auc, train_batch_prec, val_batch_prec, train_batch_recall, val_batch_recall, train_batch_f1, val_batch_f1):
+    def print_checkpoint_metric(self, train_batch_losses, val_batch_loss, train_cal_slope, val_cal_slope, train_batch_acc, val_batch_acc, 
+                                train_batch_auc, val_batch_auc, train_batch_prec, val_batch_prec, train_batch_recall, val_batch_recall, 
+                                train_batch_f1, val_batch_f1):
         
         checkpoint_train_loss = np.mean(train_batch_losses)
         checkpoint_val_loss = np.mean(val_batch_loss)
