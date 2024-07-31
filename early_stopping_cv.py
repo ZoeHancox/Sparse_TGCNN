@@ -69,8 +69,13 @@ class EarlyStopping:
             self.trace_func(f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).')
         self.val_loss_min = val_loss # replace the lowest loss value with the new lowest loss value
         if save_filters:
-            with open('../model_explainability/cnn_filters/'+run_name+'_filter.npy', 'wb') as f:
+            with open(run_name+'_filter.npy', 'wb') as f:
                 np.save(f, model.tg_conv_layer1.trainable_weights[0].numpy())
+        print("Feature maps from CNN saving...")
+        model.save_layer_output(f"{run_name}_CNN_feature_maps.npy")
+        print("Model weights saving...")
+        model.save_weights(f"{run_name}_CNN_layer")
+        
         
         if improved_acc:
             test_logits_list, test_demo_list, test_pat_num_list = [], [], []
@@ -135,7 +140,7 @@ class EarlyStopping:
 
             # Checking the probability distributions and outcome distribution on the final batch   
             # plot_figures.draw_confusion_mat(y_batch_test, test_logits, ['none','hip'], run_name=None, ran_search_num=2222, data_type="T")
-            plot_figures.draw_calibration_curve(np.array(flattened_test_labels), np.array(test_logits_list), run_name=None, ran_search_num=2222)
+            #plot_figures.draw_calibration_curve(np.array(flattened_test_labels), np.array(test_logits_list), run_name=None, ran_search_num=2222)
             
             print("*"*40)
             
