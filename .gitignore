@@ -5,3 +5,14 @@ pred_proba_and_true
 recalibration/logits_and_outcome_csvs/
 recalibration/plots/
 results/cross_validation_results.csv
+
+# HTML
+*.html
+
+# Model weights
+*.data-00000-of-00001
+*.index
+
+*.csv
+
+checkpoint
