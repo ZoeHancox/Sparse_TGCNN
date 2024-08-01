@@ -15,6 +15,7 @@ class TGCNN_Model(tf.keras.Model):
                 second_TGCNN_layer=True, num_labels=2):
         
         super(TGCNN_Model, self).__init__()
+        # self.input_layer = tf.keras.Input(shape=(None, num_nodes, num_nodes, num_time_steps), sparse=True)
         self.LSTM_ablation = LSTM_ablation
         self.second_TGCNN_layer = second_TGCNN_layer
         
@@ -48,6 +49,8 @@ class TGCNN_Model(tf.keras.Model):
         self.fcl_after_concat2 = tf.keras.layers.Dense(units=512)
         self.fcl_to_out = tf.keras.layers.Dense(units=num_labels)#, activation="softmax") softmax activation can't be used here with softmax_cross_entropy_with_logits
         self.dropout = tf.keras.layers.Dropout(rate=dropout_rate)
+
+        self.saved_layer_output = None
         
     def flat_to_out(self, x):
         x = self.flatten(x)
@@ -87,7 +90,11 @@ class TGCNN_Model(tf.keras.Model):
         elif self.second_TGCNN_layer == True:
             
             # long stream (stride = 1)#####################
+            #print("input shape into 3D CNN", inputs.shape)
             x_long = self.tg_conv_layer1(inputs)
+            #print("Output shape of 3DCNN:", x_long.shape)
+            #print("\n\nAfter 3DCNN layer out:", x_long)
+            self.saved_layer_output=x_long
             x_long = self.batchnorm1(x_long)
             x_long = self.activation(x_long)
             x_long = tf.squeeze(x_long, axis=2)
@@ -95,6 +102,7 @@ class TGCNN_Model(tf.keras.Model):
             if self.LSTM_ablation == False: # with LSTM layer
                 x_long = tf.transpose(x_long, perm=[0,2,1]) # switch axis 1 and 2 for LSTM input
                 x_long = self.lstm(x_long)
+                # print("shape of LSTM output", x_long.shape)
             x_long = self.flatten(x_long)
             x_long = self.dropout(x_long)
             x_long = self.fcl1_long(x_long)
@@ -125,3 +133,10 @@ class TGCNN_Model(tf.keras.Model):
             
             
         return out
+    
+    def save_layer_output(self, file_path):
+        if self.saved_layer_output is not None:
+            np.save(file_path, self.saved_layer_output.numpy())
+        else:
+            print("Layer output not available")
+
