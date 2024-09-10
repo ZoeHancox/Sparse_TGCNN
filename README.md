@@ -1,5 +1,7 @@
 # Sparse TG-CNN
 
+[![DOI](https://zenodo.org/badge/624601873.svg)](https://zenodo.org/doi/10.5281/zenodo.13740953)
+
 ### About the Repository
 
 This repository contains the code for a sparse implementation for Temporal Graph-based 3D Convolutional Neural Networks (TG-CNNs) as described in the paper: Developing the Temporal Graph Convolutional Neural Network Model to Predict Hip Replacement using Electronic Health Records. 
@@ -140,8 +142,9 @@ The TGCNN model was developed using data provided by patients and collected by t
 
 ### Referencing
 
-If you make use of this code, please cite this work using:
+If you make use of this code, please cite this work using this doi:
 
+https://zenodo.org/doi/10.5281/zenodo.13740953
 
 If you reference or make use of the paper, please cite our work using:
 
