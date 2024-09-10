@@ -2,7 +2,13 @@
 
 ### About the Repository
 
-This repository contains the code for a sparse implementation for Temporal Graph-based 3D Convolutional Neural Networks (TG-CNNs).
+This repository contains the code for a sparse implementation for Temporal Graph-based 3D Convolutional Neural Networks (TG-CNNs) as described in the paper: Developing the Temporal Graph Convolutional Neural Network Model to Predict Hip Replacement using Electronic Health Records. 
+
+We are pleased to announce that this work has been accepted to the [2024 International Conference on Machine Learning and Applications (ICMLA)](https://www.icmla-conference.org/icmla24/index.php), which will be held from December 18-20, 2024 in Miami, Florida.
+
+You can find the pre-print of our paper here: _link will be added when available on ArXiV_. 
+
+Click here to access a PDF of the supplementary material for our paper [here](supplementary_material_developing_the_TGCNN_model_to_predict_hip_replacement_using_EHR.pdf).
 
 In this research we represent graphs as 3D tensors, where the cells contain the elapsed time between two event codes being recorded:
 
@@ -121,3 +127,22 @@ We ran these hyperparameters on the ablation models for 12 hours each.
 
 To test some of the functions you can run the following from the top directory:
 `pytest tests/test_model.py`.
+
+### LICENSE
+
+Unless stated otherwise, the codebase is released under the BSD Licence. This covers both the codebase and any sample code in the documentation.
+
+See [LICENCE](https://github.com/ZoeHancox/Sparse_TGCNN/blob/main/LICENSE.txt) for more information.
+
+### ACKNOWLEDGEMENTS
+
+The TGCNN model was developed using data provided by patients and collected by the NHS as part of their care and support. 
+
+### Referencing
+
+If you make use of this code, please cite this work using:
+
+
+If you reference or make use of the paper, please cite our work using:
+
+_to be added_
