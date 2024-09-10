@@ -22,7 +22,7 @@ class TGCNN_layer(tf.keras.layers.Layer):
     def __init__(self, num_nodes, num_time_steps, num_filters, filter_size, stride, variable_gamma, 
                  exponential_scaling, no_timestamp, parallel_iter=100, dtype_weights=tf.float32, name=None, **kwargs):
         super(TGCNN_layer, self).__init__(name=name, **kwargs)
-
+        # self.input_layer = tf.keras.Input(shape=(None, num_nodes, num_nodes, num_time_steps), sparse=True)
         self.num_nodes = num_nodes
         self.time_steps = num_time_steps # T = the temporal length of the graphs
         self.num_filters = num_filters
@@ -37,7 +37,7 @@ class TGCNN_layer(tf.keras.layers.Layer):
         w_init = tf.random_normal_initializer(stddev = 0.05)#1e-3)
         self.w = tf.Variable(
             initial_value=w_init(shape=(self.num_nodes*self.num_nodes*self.filter_size, self.num_filters)),
-            trainable=True, dtype=self.dtype_weights, name='3dcnn_weights')
+            trainable=True, dtype=self.dtype_weights, name='3dcnn_filters')
         
         g_init = tf.random_normal_initializer()
         if self.exponential_scaling & self.variable_gamma:
@@ -199,3 +199,4 @@ class TGCNN_layer(tf.keras.layers.Layer):
     
     
 
+tf.keras.utils.get_custom_objects().update({'TGCNNLayer': TGCNN_layer})

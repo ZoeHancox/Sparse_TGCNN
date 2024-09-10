@@ -45,6 +45,7 @@ def model_metrics(y_true, dummy_pred, logits):
 
 def train_step(x, y_batch_train, trn_demo_vals, reg_strength, class_weights, model, L1_ablation, L2_ablation, graph_reg_strength, graph_reg_incl, exponential_scaling, weighted_loss, variable_gamma, optimizer, demo):
     x_batch_train = utils.list_to_4D_tensor(x) # takes one batch from the training set
+    # print("input to model shape:", x_batch_train.shape)
 
     # Open a GradientTape to record the operations run during the forward pass, which enables auto-differentiation.
     with tf.GradientTape() as tape:
@@ -52,6 +53,8 @@ def train_step(x, y_batch_train, trn_demo_vals, reg_strength, class_weights, mod
         # Run the forward pass of the layer.
         # The operations that the layer applies to its inputs are going to be recorded on the GradientTape.
         if demo:
+            # print("Output  from TGCNN model.layers[0]", model.layers[0](tf.keras.Input(shape=x_batch_train.shape, sparse=True)))
+            # print("Output shape from TGCNN model.layers[0]", model.layers[0](tf.keras.Input(shape=x_batch_train.shape, sparse=True)).shape)
             trn_logits = model(x_batch_train, trn_demo_vals, training=True)
         else:
             trn_logits = model(x_batch_train, training=True)
