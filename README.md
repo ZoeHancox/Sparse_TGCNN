@@ -8,7 +8,7 @@ This repository contains the code for a sparse implementation for Temporal Graph
 
 We are pleased to announce that this work has been accepted to the [2024 International Conference on Machine Learning and Applications (ICMLA)](https://www.icmla-conference.org/icmla24/index.php), which will be held from December 18-20, 2024 in Miami, Florida.
 
-You can find the pre-print of our paper here: _link will be added when available on ArXiV_. 
+You can find the pre-print of our paper here: [https://arxiv.org/abs/2409.06585](https://arxiv.org/abs/2409.06585). 
 
 Click here to access a PDF of the supplementary material for our paper [here](supplementary_material_developing_the_TGCNN_model_to_predict_hip_replacement_using_EHR.pdf).
 
@@ -142,10 +142,19 @@ The TGCNN model was developed using data provided by patients and collected by t
 
 ### Referencing
 
-If you make use of this code, please cite this work using this doi:
+If you make use of the code in this repository, please cite this work using this doi:
 
 https://zenodo.org/doi/10.5281/zenodo.13740953
 
-If you reference or make use of the paper, please cite our work using:
+If you reference or make use of the paper, please cite the following:
 
-_to be added_
+```bibtex
+@misc{hancox2024developingtemporalgraphconvolutional,
+      title={Developing the Temporal Graph Convolutional Neural Network Model to Predict Hip Replacement using Electronic Health Records}, 
+      author={Zoe Hancox and Sarah R. Kingsbury and Andrew Clegg and Philip G. Conaghan and Samuel D. Relton},
+      year={2024},
+      eprint={2409.06585},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2409.06585}, 
+}
